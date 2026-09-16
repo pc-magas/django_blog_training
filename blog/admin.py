@@ -18,3 +18,9 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ("title", "content")
     prepopulated_fields = {"slug": ("title",)}
 
+    def has_add_permission(self, request):
+        return request.user.has_perm("blog.create_article")
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.has_perm("blog.edit_article")
+

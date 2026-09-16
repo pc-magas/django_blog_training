@@ -17,6 +17,16 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class Author(User):
+    class Meta:
+        proxy=True
+        permissions=[("create_article","User can create article"),("edit_article","Edit Article")]
+
+class Publisher(User):
+    class Meta:
+        proxy=True
+        permissions=[("edit_article","Edit Article")]
+
 class Article(models.Model):
     id=models.AutoField(primary_key=True)
     title=models.CharField(max_length=255)
