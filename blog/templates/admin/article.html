@@ -1,37 +1,64 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/change_form.html" %}
 
-{% block extrajs %}
-    {{ block.super }}
- 	<script src="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.umd.js"></script>
-
-{% endblock %}
-
-{% block extrastyle %}
+{% block extrahead %}
     {{ block.super }}
     <link
         rel="stylesheet"
         href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css"
     >
+   	<script src="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.umd.js"></script>
+
 {% endblock %}
 
-{% block content %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
 
-    {{ form.non_field_errors }}
+{% block admin_change_form_document_ready %}
 
-    <div>
-        {{ form.title.label_tag }}
-        {{ form.title }}
-        {{ form.title.errors }}
-    </div>
+    {{ block.super }}
 
-    <div>
-        {{ form.content.label_tag }}
-        {{ form.content }}
-        {{ form.content.errors }}
-    </div>
+    <script>
+        const {
+            ClassicEditor,
+            Essentials,
+            Paragraph,
+            Bold,
+            Italic,
+            Link,
+            
+        } = CKEDITOR;
 
-    <button type="submit">Save</button>
-</form>
+        const textarea = document.querySelector("#article-content");
+
+        if (!textarea) {
+            console.error("Could not find #article-content");
+        } else {
+            ClassicEditor
+                .create(textarea, {
+                    plugins: [
+                        Essentials,
+                        Paragraph,
+                        Bold,
+                        Italic,
+                        Link,
+                        List
+                    ],
+                    toolbar: [
+                        "undo",
+                        "redo",
+                        "|",
+                        "bold",
+                        "italic",
+                        "link",
+                        "|",
+                        "bulletedList",
+                        "numberedList"
+                    ]
+                })
+                .then(editor => {
+                    console.log("CKEditor initialized", editor);
+                })
+                .catch(error => {
+                    console.error("CKEditor initialization failed:", error);
+                });
+        }
+    </script>
 {% endblock %}
