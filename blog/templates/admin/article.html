@@ -2,7 +2,79 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css" />
+
+    <link rel="stylesheet"
+          href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css" />
+
+    <style>
+        /* Main article layout */
+        .article-editor-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .article-main {
+            min-width: 0;
+        }
+
+        .article-sidebar {
+            min-width: 0;
+        }
+
+        /* Remove Django's normal field-row spacing */
+        .article-main .form-row,
+        .article-sidebar .form-row {
+            padding: 0;
+            border-bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        /* Hide labels for title/content */
+        .article-main .field-title > div > label,
+        .article-main .field-content > div > label {
+            display: none;
+        }
+
+        /* Title */
+        .article-main .field-title input {
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1.5rem;
+            padding: 12px 14px;
+        }
+
+        /* CKEditor */
+        .article-main .field-content {
+            width: 100%;
+        }
+
+        .article-main .field-content .ck-editor {
+            width: 100%;
+        }
+
+        .article-main .field-content .ck-editor__editable {
+            min-height: 600px;
+        }
+
+        /* Sidebar */
+        .article-sidebar .form-row {
+            width: 100%;
+        }
+
+        .article-sidebar input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .article-editor-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 {% endblock %}
 
 
@@ -61,4 +133,52 @@
                 });
         }
     </script>
+{% endblock %}
+
+{% block field_sets %}
+
+<div class="article-editor-layout">
+
+    <main class="article-main">
+
+        {{ adminform.form.title.errors }}
+        <div class="form-row field-title">
+            <div>
+                {{ adminform.form.title }}
+            </div>
+        </div>
+
+        {{ adminform.form.content.errors }}
+        <div class="form-row field-content">
+            <div>
+                {{ adminform.form.content }}
+            </div>
+        </div>
+
+    </main>
+
+
+    <aside class="article-sidebar">
+
+        {{ adminform.form.slug.errors }}
+        <div class="form-row field-slug">
+            {{ adminform.form.slug.label_tag }}
+            <div>
+                {{ adminform.form.slug }}
+            </div>
+        </div>
+
+
+        {{ adminform.form.category.errors }}
+        <div class="form-row field-tags">
+            {{ adminform.form.category.label_tag }}
+            <div>
+                {{ adminform.form.category }}
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
 {% endblock %}

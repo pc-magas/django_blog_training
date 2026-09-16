@@ -26,4 +26,6 @@ class Article(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.title
 
