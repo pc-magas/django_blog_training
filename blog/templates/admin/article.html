@@ -1,13 +1,14 @@
 {% extends "admin/change_form.html" %}
 
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css" />
+{% endblock %}
+
+
 {% block extrahead %}
     {{ block.super }}
-    <link
-        rel="stylesheet"
-        href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css"
-    >
    	<script src="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.umd.js"></script>
-
 {% endblock %}
 
 
@@ -19,27 +20,26 @@
         const {
             ClassicEditor,
             Essentials,
-            Paragraph,
             Bold,
             Italic,
-            Link,
-            
+            Font,
+            Paragraph
         } = CKEDITOR;
 
         const textarea = document.querySelector("#article-content");
+        const LICENSE_KEY = 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3OTA4MTI3OTksImp0aSI6ImQ1ODYzMjZiLTNhYmYtNDMzNC1iZTFhLWUwNjA1YjAyZTBmYiIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJyZW1vdmVGZWF0dXJlcyI6WyJBSSJdLCJ2YyI6ImNjYjZiODBhIn0.MJyRI-YBGwhSRGkGNbDyFy61VsG5TZdS-OzInRfy_SutH-fezgXygUY6iHgkTQOg4v6r_-j_O7fXQ_8PJZrpyA';
 
         if (!textarea) {
             console.error("Could not find #article-content");
         } else {
             ClassicEditor
                 .create(textarea, {
+                    licenseKey: LICENSE_KEY,
                     plugins: [
                         Essentials,
                         Paragraph,
                         Bold,
-                        Italic,
-                        Link,
-                        List
+                        Italic
                     ],
                     toolbar: [
                         "undo",
