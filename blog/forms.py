@@ -1,7 +1,6 @@
 from django import forms
 from .models import Article
 
-
 class ArticleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):

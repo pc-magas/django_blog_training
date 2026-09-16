@@ -23,3 +23,4 @@ class ArticleAdmin(admin.ModelAdmin):
     list_filter = ("category", "author")
     search_fields = ("title", "content")
     prepopulated_fields = {"slug": ("title",)}
+
