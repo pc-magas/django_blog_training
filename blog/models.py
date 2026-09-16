@@ -1,16 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import AbstractUser
+
+from django.conf import settings
 import bleach
 
-# Create your models here.
-
-class Author(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+class User(AbstractUser):
     bio = models.TextField()
 
     def __str__(self):
-        return self.user.first_name
-
+        return self.first_name+' '+self.last_name
 
 class Category(models.Model):
     id=models.AutoField(primary_key=True)
@@ -24,7 +22,7 @@ class Article(models.Model):
     title=models.CharField(max_length=255)
     content=models.TextField()
     slug=models.SlugField()
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
     def __str__(self):
@@ -48,4 +46,3 @@ class Article(models.Model):
         )
 
         super().save(*args, **kwargs)
-

@@ -1,12 +1,6 @@
 from django.contrib import admin
-from .models import Author, Category, Article
+from .models import Category, Article
 from .forms import ArticleForm
-
-
-@admin.register(Author)
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ("user", "bio")
-
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
