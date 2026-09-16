@@ -6,6 +6,8 @@ class ArticleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # When rendered upon admin category has a + icon rendered on the side or bellow.
+        # That removes the + icon and let the developer to place it whenever he wants.
         self.fields["category"].widget.can_add_related = False
         self.fields["category"].widget.can_change_related = False
         self.fields["category"].widget.can_delete_related = False

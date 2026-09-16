@@ -31,6 +31,8 @@ class Article(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+
+        # TODO: maybe create a common rules for Field Bleaching
         self.content = bleach.clean(
             self.content,
             tags=[
