@@ -27,6 +27,9 @@ class Article(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
         self.content = bleach.clean(
             self.content,
