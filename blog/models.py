@@ -1,14 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import Group,AbstractUser
 
 from django.conf import settings
 import bleach
-
-class User(AbstractUser):
-    bio = models.TextField()
-
-    def __str__(self):
-        return self.first_name+' '+self.last_name
 
 class Category(models.Model):
     id=models.AutoField(primary_key=True)
@@ -16,16 +10,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-class Author(User):
-    class Meta:
-        proxy=True
-        permissions=[("create_article","User can create article"),("edit_article","Edit Article")]
-
-class Publisher(User):
-    class Meta:
-        proxy=True
-        permissions=[("edit_article","Edit Article")]
 
 class Article(models.Model):
     id=models.AutoField(primary_key=True)

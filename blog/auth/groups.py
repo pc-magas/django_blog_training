@@ -1,0 +1,2 @@
+AUTHOR="author"
+EDITOR="editor"
