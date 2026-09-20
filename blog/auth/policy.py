@@ -1,15 +1,12 @@
 from .groups import AUTHOR, EDITOR
-from .permissions import (
-    CREATE_ARTICLE,
-    UPDATE_ARTICLE,
-    DELETE_ARTICLE,
-)
+
 
 GROUP_PERMISSIONS = {
     AUTHOR: {
-        CREATE_ARTICLE,
+        ("add_article"),
+        ("update_article")
     },
     EDITOR: {
-        UPDATE_ARTICLE,
+        ("update_article"),
     },
 }

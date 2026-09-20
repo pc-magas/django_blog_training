@@ -104,6 +104,8 @@ class Command(BaseCommand):
                 pass
 
 
+    
+
     def __print_policies(self,policies):
         for app_label, group_permissions in policies.items():
             self.stdout.write(f"++ APP: {app_label} ++")
@@ -112,10 +114,8 @@ class Command(BaseCommand):
                 self.stdout.write(f"GROUP: {group_name}")
                 
                 for permission in permissions:
-                    self.stdout.write(f"\t{permission[0]} : {permission[1]}")
+                    self.stdout.write(f"\t{self.permission_codename(permission)} : {self.permission_description(permission)}")
             
-
-                
 
               
     # ------------------------------------------------------------------
@@ -232,6 +232,12 @@ class Command(BaseCommand):
             f"Invalid permission definition: {permission!r}"
         )
 
+    @staticmethod
+    def permission_description(permission):
+
+        if isinstance(permission, (tuple, list)) and len(permission) > 1:
+            return permission[1]
     
+        return ""
 
     

@@ -21,11 +21,6 @@ class Article(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
-    class Meta:
-        permissions = [
-            blog.auth.permissions.CREATE_ARTICLE,
-            blog.auth.permissions.UPDATE_ARTICLE,
-        ]
 
     def __str__(self):
         return self.title

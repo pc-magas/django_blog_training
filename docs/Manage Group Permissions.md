@@ -9,21 +9,8 @@ Each app should contain a folder named `auth` with these files:
 
 ## Assign group Permission
 
-### Step1: Assign permissions upon `auth/permissions.py`
 
-For example:
-
-```
-CREATE_ARTICLE=("create_article","Permission for a User to create an Article")
-UPDATE_ARTICLE=("update_article","Permission for a user to edit an article")
-DELETE_ARTICLE=("delete_article","Permsisiion to edit an article")
-
-```
-
-Each varialbe is a tupple containing the permission name as first name and the permission description as the second one.
-
-
-### Step 2: Assign groups into `auth/groups.py`
+### Step 1: Assign groups into `auth/groups.py`
 
 For example:
 
@@ -42,19 +29,15 @@ For example:
 
 ```
 from .groups import AUTHOR, EDITOR
-from .permissions import (
-    CREATE_ARTICLE,
-    UPDATE_ARTICLE,
-    DELETE_ARTICLE,
-)
+
 
 GROUP_PERMISSIONS = {
     AUTHOR: {
-        CREATE_ARTICLE,
+        ("add_article"),
+        ("update_article")
     },
     EDITOR: {
-        CREATE_ARTICLE,
-        UPDATE_ARTICLE,
+        ("update_article"),
     },
 }
 ```
