@@ -59,6 +59,9 @@ class ArticleAdmin(admin.ModelAdmin):
         return qs
     
     def save_model(self, request, obj, form, change):
+
+        # Maybe load a service managing the New Article????
+        
         if not change:  # only when creating a new article
             obj.author = request.user
 
