@@ -1,0 +1,107 @@
+# Manage group Permissions
+
+Each app should contain a folder named `auth` with these files:
+
+* `permissions.py` that defines all app permission into a deistinct variables
+* `groups.py` that defines all app groups into distinct variables
+* `policy.py` that defines what permissions each group should have.
+
+
+## Assign group Permission
+
+### Step1: Assign permissions upon `auth/permissions.py`
+
+For example:
+
+```
+CREATE_ARTICLE=("create_article","Permission for a User to create an Article")
+UPDATE_ARTICLE=("update_article","Permission for a user to edit an article")
+DELETE_ARTICLE=("delete_article","Permsisiion to edit an article")
+
+```
+
+Each varialbe is a tupple containing the permission name as first name and the permission description as the second one.
+
+
+### Step 2: Assign groups into `auth/groups.py`
+
+For example:
+
+```
+AUTHOR="author"
+EDITOR="editor"
+```
+
+This file contains a list of variables representing a group.
+
+### Step 3: Create/update `auth/policy.py`
+
+Each app has a `policy.py` that defines which permissions a group should have.
+
+For example:
+
+```
+from .groups import AUTHOR, EDITOR
+from .permissions import (
+    CREATE_ARTICLE,
+    UPDATE_ARTICLE,
+    DELETE_ARTICLE,
+)
+
+GROUP_PERMISSIONS = {
+    AUTHOR: {
+        CREATE_ARTICLE,
+    },
+    EDITOR: {
+        CREATE_ARTICLE,
+        UPDATE_ARTICLE,
+    },
+}
+```
+
+
+### Step 4: Assign Policies upon models:
+
+Then upon model you can assign your permissions:
+
+```
+
+class Article(models.Model):
+    id=models.AutoField(primary_key=True)
+    title=models.CharField(max_length=255)
+    content=models.TextField()
+    slug=models.SlugField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    category = models.ManyToManyField(Category)
+
+    class Meta:
+        permissions = [
+            blog.auth.permissions.CREATE_ARTICLE,
+            blog.auth.permissions.UPDATE_ARTICLE,
+        ]
+```
+
+#### Step 5: Save permissions into db:
+
+```
+python manage.py makemigration
+python manage.py migrate
+python manage.py sync_group_policies
+```
+
+## Update Model permissions
+
+Once you add a new permission upon a model run:
+
+```
+python manage.py makemigration
+python manage.py migrate
+python manage.py sync_group_policies
+```
+
+
+## Miscelanmous Notes:
+1. The `sync_group_policies` would assign a permission upon group only if:
+   1. A permission is assigned into a model as well.
+   2. A permission is assigned ionto a group upon `auth/policy.py`
+2. The django framework itself generates default permissions for each model. These permissions are not defined at `auth/permissions.py` unless you define them.
