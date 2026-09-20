@@ -10,7 +10,6 @@ GROUP_PERMISSIONS = {
         CREATE_ARTICLE,
     },
     EDITOR: {
-        CREATE_ARTICLE,
         UPDATE_ARTICLE,
     },
 }

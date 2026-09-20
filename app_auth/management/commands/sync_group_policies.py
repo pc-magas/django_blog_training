@@ -34,10 +34,8 @@ class Command(BaseCommand):
 
         final_policy = self.aggregate_policy(policies)
 
-        self.stdout.write("")
-        self.stdout.write(
-            f"Desired groups: {len(final_policy)}"
-        )
+        self.stdout.write("\n=================")
+
 
         with transaction.atomic():
             self.stdout.write("Syncing groups")
@@ -62,7 +60,7 @@ class Command(BaseCommand):
                 db_group.save()
                 existing_policies.append(db_group.name)
             else:
-                db_group.permission.clear()
+                db_group.permissions.clear()
                 db_group.delete()
         
 
@@ -83,7 +81,7 @@ class Command(BaseCommand):
         to_remove = db_permissions - permissions
 
         for permission_to_remove in to_remove:
-            self.stdout.write(f"Removing Permission {permission_to_remove} into group {group.name}")
+            self.stdout.write(f"Removing Permission {permission_to_remove} from group {group.name}")
 
             try:
                 permission = group.permissions.get(codename=permission_to_remove)
@@ -108,18 +106,18 @@ class Command(BaseCommand):
 
     def __print_policies(self,policies):
         for app_label, group_permissions in policies.items():
-            self.stdout.write(f"  {app_label}")
+            self.stdout.write(f"++ APP: {app_label} ++")
             
-            permission_str = group_permissions
-            if isinstance(group_permissions, tuple):
-                permission_str= group_permissions[0]+" : "+group_permissions[1]
-
             for group_name, permissions in group_permissions.items():
-                self.stdout.write(
-                    f"    {group_name}: "
-                    + ", ".join(permission_str)
-                )
+                self.stdout.write(f"GROUP: {group_name}")
+                
+                for permission in permissions:
+                    self.stdout.write(f"\t{permission[0]} : {permission[1]}")
+            
 
+                
+
+              
     # ------------------------------------------------------------------
     # Policy discovery
     # ------------------------------------------------------------------
@@ -134,7 +132,7 @@ class Command(BaseCommand):
 
             GROUP_PERMISSIONS = {
                 "group_name": {
-                    permission_definition,
+                   ("permission_name","permission_description"),
                     ...
                 }
             }
@@ -181,8 +179,8 @@ class Command(BaseCommand):
     #
     # {
     #     "author": {
-    #         "blog.create_article",
-    #         "blog.edit_article",
+    #         "create_article",
+    #         "edit_article",
     #     },
     # }
     # ------------------------------------------------------------------
