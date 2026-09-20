@@ -9,7 +9,6 @@ Each app should contain a folder named `auth` with these files:
 
 ## Assign group Permission
 
-
 ### Step 1: Assign groups into `auth/groups.py`
 
 For example:
@@ -21,7 +20,7 @@ EDITOR="editor"
 
 This file contains a list of variables representing a group.
 
-### Step 3: Create/update `auth/policy.py`
+### Step 2: Create/update `auth/policy.py`
 
 Each app has a `policy.py` that defines which permissions a group should have.
 
@@ -29,21 +28,25 @@ For example:
 
 ```
 from .groups import AUTHOR, EDITOR
-
+from .permissions import (
+    CREATE_ARTICLE,
+    UPDATE_ARTICLE,
+    DELETE_ARTICLE,
+)
 
 GROUP_PERMISSIONS = {
     AUTHOR: {
-        ("add_article"),
-        ("update_article")
+        CREATE_ARTICLE,
     },
     EDITOR: {
-        ("update_article"),
+        CREATE_ARTICLE,
+        UPDATE_ARTICLE,
     },
 }
 ```
 
 
-### Step 4: Assign Policies upon models:
+### Step 3: Assign Policies upon models:
 
 Then upon model you can assign your permissions:
 
@@ -59,12 +62,14 @@ class Article(models.Model):
 
     class Meta:
         permissions = [
-            blog.auth.permissions.CREATE_ARTICLE,
-            blog.auth.permissions.UPDATE_ARTICLE,
+            ("create_article","Can create article"),
+            ("update_article","Can update article"),
         ]
 ```
 
-#### Step 5: Save permissions into db:
+Keep in mind that django upon each model assigns default permissions. Consult `auth_permission` and `django_content_type` for the available permissions.
+
+#### Step 4: Save permissions into db:
 
 ```
 python manage.py makemigration

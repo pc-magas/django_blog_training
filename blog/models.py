@@ -4,7 +4,6 @@ from django.contrib.auth.models import Group,AbstractUser
 from django.conf import settings
 import bleach
 
-import blog.auth.permissions
 
 class Category(models.Model):
     id=models.AutoField(primary_key=True)
@@ -20,7 +19,6 @@ class Article(models.Model):
     slug=models.SlugField()
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
-
 
     def __str__(self):
         return self.title
@@ -41,5 +39,7 @@ class Article(models.Model):
             protocols=["http", "https", "mailto"],
             strip=True,
         )
+
+        
 
         super().save(*args, **kwargs)

@@ -3,10 +3,13 @@ from .groups import AUTHOR, EDITOR
 
 GROUP_PERMISSIONS = {
     AUTHOR: {
-        ("add_article"),
-        ("update_article")
+        "add_article",
+        "change_article",
+        "delete_article",
+        "view_article"
     },
     EDITOR: {
-        ("update_article"),
+        "change_article",
+        "view_article"
     },
 }
