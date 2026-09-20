@@ -84,16 +84,27 @@ class Command(BaseCommand):
 
         for permission_to_remove in to_remove:
             self.stdout.write(f"Removing Permission {permission_to_remove} into group {group.name}")
-            permission = group.permissions.get(codename=permission_to_remove)
-            if permission:
+
+            try:
+                permission = group.permissions.get(codename=permission_to_remove)
                 group.permissions.remove(permission)
+            except Permission.DoesNotExist:
+                self.stderr.write(f"Permission {permission_to_remove} not found skipping removal from group {group.name}")
+                pass
 
 
         to_add = permissions - db_permissions
         for permission_to_add in to_add:
             self.stdout.write(f"Adding Permission {permission_to_add} into group {group.name}")
-            permission, created = Permission.objects.get_or_create(codename=permission_to_add)
-            group.permissions.add(permission)
+            
+            try:
+                # Persmission adding or removal is performed via migrations
+                permission = Permission.objects.get(codename=permission_to_add)
+                group.permissions.add(permission)
+            except Permission.DoesNotExist:
+                self.stderr.write(f"Permission {permission_to_add} not found skipping adding into group {group.name}")
+                pass
+
 
     def __print_policies(self,policies):
         for app_label, group_permissions in policies.items():
@@ -188,7 +199,7 @@ class Command(BaseCommand):
                 for permission in permissions:
                     codename = self.permission_codename(permission)
 
-                    permission_id = f"{app_label}.{codename}"
+                    permission_id = f"{codename}"
 
                     desired_groups[group_name].add(permission_id)
 

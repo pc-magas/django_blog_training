@@ -24,7 +24,7 @@ class Article(models.Model):
     class Meta:
         permissions = [
             blog.auth.permissions.CREATE_ARTICLE,
-            blog.auth.permissions.UPDATE_ARTICLE
+            blog.auth.permissions.UPDATE_ARTICLE,
         ]
 
     def __str__(self):
