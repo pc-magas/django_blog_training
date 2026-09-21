@@ -1,12 +1,9 @@
-from importlib import import_module
 
-from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from django.contrib.auth.models import Group, Permission
-
-from pprint import pprint
+from app_auth.utils.policy_aggregator import PolicyAggregator
 
 class Command(BaseCommand):
     help = "Synchronize Django Groups and Permissions from app auth/policy.py files."
@@ -21,7 +18,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
 
-        policies = self.discover_policies()
+        policies = PolicyAggregator.discover_policies()
         
         if not policies:
             self.stdout.write(
@@ -32,7 +29,7 @@ class Command(BaseCommand):
         self.stdout.write("Discovered policies:")
         self.__print_policies(policies)
 
-        final_policy = self.aggregate_policy(policies)
+        final_policy = PolicyAggregator.aggregate_policy(policies)
 
         self.stdout.write("\n=================")
 
@@ -74,7 +71,7 @@ class Command(BaseCommand):
 
     def sync_group_permissions(self,permissions:list,group:Group):
         
-        permissions = set(map(lambda p: self.permission_codename(p), permissions))
+        permissions = set(map(lambda p: PolicyAggregator.permission_codename(p), permissions))
         db_permissions = set(group.permissions.values_list("codename", flat=True))
 
         # get permissions in db but not permissions list
@@ -107,137 +104,10 @@ class Command(BaseCommand):
     
 
     def __print_policies(self,policies):
-        for app_label, group_permissions in policies.items():
+        for app_label, policy in policies.items():
             self.stdout.write(f"++ APP: {app_label} ++")
             
-            for group_name, permissions in group_permissions.items():
+            for group_name, group_policy in policy.items():
                 self.stdout.write(f"GROUP: {group_name}")
-                
-                for permission in permissions:
-                    self.stdout.write(f"\t{self.permission_codename(permission)} : {self.permission_description(permission)}")
-            
-
-              
-    # ------------------------------------------------------------------
-    # Policy discovery
-    # ------------------------------------------------------------------
-
-    def discover_policies(self):
-        """
-        Find every installed app containing:
-
-            <app>/auth/policy.py
-
-        The policy module must expose:
-
-            GROUP_PERMISSIONS = {
-                "group_name": {
-                   ("permission_name","permission_description"),
-                    ...
-                }
-            }
-        """
-
-        policies = {}
-
-        for app_config in apps.get_app_configs():
-            module_name = f"{app_config.name}.auth.policy"
-
-            if module_name.startswith("django"):
-                continue
-
-            try:
-                module = import_module(module_name)
-            except ModuleNotFoundError as exc:
-                continue
-
-            group_permissions = getattr(
-                module,
-                "GROUP_PERMISSIONS",
-                None,
-            )
-
-            if group_permissions is None:
-                raise CommandError(
-                    f"{module_name} exists but does not define "
-                    "GROUP_PERMISSIONS."
-                )
-
-            app_label = app_config.label
-
-            if app_label in policies:
-                raise CommandError(
-                    f"Duplicate policy for app '{app_label}'."
-                )
-
-            policies[app_label] = group_permissions
-
-        return policies
-
-    # ------------------------------------------------------------------
-    # Convert policies into:
-    #
-    # {
-    #     "author": {
-    #         "create_article",
-    #         "edit_article",
-    #     },
-    # }
-    # ------------------------------------------------------------------
-
-    def aggregate_policy(self, policies):
-        desired_groups = {}
-
-        for app_label, group_permissions in policies.items():
-            for group_name, permissions in group_permissions.items():
-
-                if group_name not in desired_groups:
-                    desired_groups[group_name] = set()
-
-                for permission in permissions:
-                    codename = self.permission_codename(permission)
-
-                    permission_id = f"{codename}"
-
-                    desired_groups[group_name].add(permission_id)
-
-        return desired_groups
-
-    # ------------------------------------------------------------------
-    # Permission definition handling
-    # ------------------------------------------------------------------
-
-    @staticmethod
-    def permission_codename(permission):
-        """
-        Supports both:
-
-            "create_article"
-
-        and:
-
-            (
-                "create_article",
-                "Can create article",
-            )
-        """
-
-        if isinstance(permission, str):
-            return permission
-
-        if isinstance(permission, (tuple, list)) and permission:
-            return permission[0]
-
-        raise CommandError(
-            f"Invalid permission definition: {permission!r}"
-        )
-
-    @staticmethod
-    def permission_description(permission):
-
-        if isinstance(permission, (tuple, list)) and len(permission) > 1:
-            return permission[1]
-    
-        return ""
-
-    
+                for permission in group_policy['permissions']:
+                    self.stdout.write(f"\t{PolicyAggregator.permission_codename(permission)} : {PolicyAggregator.permission_description(permission)}")
