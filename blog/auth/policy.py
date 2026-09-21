@@ -10,6 +10,7 @@ GROUP_PERMISSIONS = {
     },
     EDITOR: {
         "change_article",
-        "view_article"
+        "view_article",
+        "add_user"
     },
 }
