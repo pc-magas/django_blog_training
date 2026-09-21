@@ -4,6 +4,7 @@ from django.db import transaction
 
 from django.contrib.auth.models import Group, Permission
 from app_auth.utils.policy_aggregator import PolicyAggregator
+from app_auth.utils.permission import permission_codename, permission_description
 
 class Command(BaseCommand):
     help = "Synchronize Django Groups and Permissions from app auth/policy.py files."
@@ -52,12 +53,11 @@ class Command(BaseCommand):
         from pprint import pprint
 
         for db_group in db_groups:
-
-            group_persmissions = policy[db_group.name]['permissions']
+            group_permissions = policy[db_group.name]['permissions']
             #db_group.name
             if (db_group.name in policy):
                 # update permission
-                self.sync_group_permissions(group_persmissions,db_group)
+                self.sync_group_permissions(group_permissions,db_group)
                 db_group.save()
                 existing_policies.append(db_group.name)
             else:
@@ -68,14 +68,16 @@ class Command(BaseCommand):
         new_groups = set(policy.keys()) - set(existing_policies)
 
         for group_name in new_groups:
+            group_permissions = policy[group_name]['permissions']
+
             # Create the group
             db_group = Group.objects.create(name=group_name)
-            self.sync_group_permissions(group_persmissions,db_group)
+            self.sync_group_permissions(group_permissions,db_group)
             db_group.save()
 
     def sync_group_permissions(self,permissions:list,group:Group):
         
-        permissions = set(map(lambda p: PolicyAggregator.permission_codename(p), permissions))
+        permissions = set(map(lambda p: permission_codename(p), permissions))
         db_permissions = set(group.permissions.values_list("codename", flat=True))
 
         # get permissions in db but not permissions list
@@ -97,7 +99,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Adding Permission {permission_to_add} into group {group.name}")
             
             try:
-                # Persmission adding or removal is performed via migrations
+                # Permission adding or removal is performed via migrations
                 permission = Permission.objects.get(codename=permission_to_add)
                 group.permissions.add(permission)
             except Permission.DoesNotExist:
@@ -111,4 +113,4 @@ class Command(BaseCommand):
             for group_name, group_policy in policy.items():
                 self.stdout.write(f"GROUP: {group_name}")
                 for permission in group_policy['permissions']:
-                    self.stdout.write(f"\t{PolicyAggregator.permission_codename(permission)} : {PolicyAggregator.permission_description(permission)}")
+                    self.stdout.write(f"\t{permission_codename(permission)} : {permission_description(permission)}")

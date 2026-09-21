@@ -2,7 +2,6 @@ from django.db import models
 from django.conf import settings
 import bleach
 
-
 class Category(models.Model):
     id=models.AutoField(primary_key=True)
     name=models.CharField(max_length=255)

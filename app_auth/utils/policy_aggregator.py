@@ -1,6 +1,6 @@
 from django.apps import apps
 from importlib import import_module
-
+from app_auth.utils.permission import permission_codename, permission_description
 
 DEFAULT_GROUP_POLICY = {
     "is_staff":False,
@@ -44,7 +44,7 @@ class PolicyAggregator():
             policy = getattr(module,"POLICY",None)
 
             if policy is None:
-                raise CommandError(
+                raise RuntimeError(
                     f"{module_name} exists but does not define "
                     "POLICY."
                 )
@@ -52,7 +52,7 @@ class PolicyAggregator():
             app_label = app_config.label
 
             if app_label in policies:
-                raise CommandError(
+                raise RuntimeError(
                     f"Duplicate policy for app '{app_label}'."
                 )
 
@@ -95,7 +95,7 @@ class PolicyAggregator():
                 if 'is_superuser' not in group_policy:
                     group_policy['is_superuser'] = False
 
-                existing_policy['permissions'] = [self.permission_codename(p) for p in existing_policy.get("permissions", ())]
+                existing_policy['permissions'] = [permission_codename(p) for p in existing_policy.get("permissions", ())]
 
                 final_group_policy = {
                     "is_staff":existing_policy['is_staff'] or group_policy['is_staff'],
@@ -107,37 +107,3 @@ class PolicyAggregator():
                 final_policy[group]=final_group_policy
 
         return final_policy
-
-    
-    @staticmethod
-    def permission_codename(permission):
-        """
-        Supports both:
-
-            "create_article"
-
-        and:
-
-            (
-                "create_article",
-                "Can create article",
-            )
-        """
-
-        if isinstance(permission, str):
-            return permission
-
-        if isinstance(permission, (tuple, list)) and permission:
-            return permission[0]
-
-        raise CommandError(
-            f"Invalid permission definition: {permission!r}"
-        )
-
-    @staticmethod
-    def permission_description(permission):
-
-        if isinstance(permission, (tuple, list)) and len(permission) > 1:
-            return permission[1]
-    
-        return ""
