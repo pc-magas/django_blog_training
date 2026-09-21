@@ -49,11 +49,15 @@ class Command(BaseCommand):
         
         existing_policies=[]
 
+        from pprint import pprint
+
         for db_group in db_groups:
+
+            group_persmissions = policy[db_group.name]['permissions']
             #db_group.name
             if (db_group.name in policy):
                 # update permission
-                self.sync_group_permissions(policy[db_group.name],db_group)
+                self.sync_group_permissions(group_persmissions,db_group)
                 db_group.save()
                 existing_policies.append(db_group.name)
             else:
@@ -66,7 +70,7 @@ class Command(BaseCommand):
         for group_name in new_groups:
             # Create the group
             db_group = Group.objects.create(name=group_name)
-            self.sync_group_permissions(policy[db_group.name],db_group)
+            self.sync_group_permissions(group_persmissions,db_group)
             db_group.save()
 
     def sync_group_permissions(self,permissions:list,group:Group):
@@ -99,9 +103,6 @@ class Command(BaseCommand):
             except Permission.DoesNotExist:
                 self.stderr.write(f"Permission {permission_to_add} not found skipping adding into group {group.name}")
                 pass
-
-
-    
 
     def __print_policies(self,policies):
         for app_label, policy in policies.items():
