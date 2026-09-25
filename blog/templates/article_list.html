@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+
+{%block title%} My Articles {%endblock%}
+
+{% block content %}
+    <section>
+        <h1>List of articles</h1>
+        {% for article in articles %}
+        <article class="article">
+            <h2>
+               {{ article.title }}
+            </h2>
+            <p>{{ article.content | truncatewords:30 | safe }}</p>
+        </article>
+    {% endfor %}
+
+    </section>
+
+{% endblock %}
