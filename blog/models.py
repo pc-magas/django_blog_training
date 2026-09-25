@@ -13,7 +13,7 @@ class Article(models.Model):
     id=models.AutoField(primary_key=True)
     title=models.CharField(max_length=255)
     content=models.TextField()
-    slug=models.SlugField()
+    slug=models.SlugField(unique=True)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ManyToManyField(Category)
 
