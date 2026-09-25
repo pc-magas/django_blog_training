@@ -107,3 +107,8 @@ class PolicyAggregator():
                 final_policy[group]=final_group_policy
 
         return final_policy
+    
+    @staticmethod
+    def get_current_policy_aggregated():
+        policies = PolicyAggregator.discover_policies()
+        return PolicyAggregator.aggregate_policy(policies)

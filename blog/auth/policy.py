@@ -18,6 +18,7 @@ POLICY = {
             "view_article",
             "add_user",
             "change_user"
+            "delete_user"
         },
         "manage_groups":{
             AUTHOR
