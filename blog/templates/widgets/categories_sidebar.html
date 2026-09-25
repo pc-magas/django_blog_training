@@ -3,7 +3,7 @@
 {% block sidebar_content %}
     <ul class="categories">
         {% for category in categories %}
-            <li><a href="#">{{category.name}}</a></li>
+            <li><a href="{% url 'home' %}?category={{ category.id }}">{{category.name}}</a></li>
         {% endfor %}
     </ul>
 {% endblock %}

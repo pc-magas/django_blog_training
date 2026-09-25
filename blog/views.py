@@ -6,6 +6,15 @@ from .models import Article
 # Create your views here.
 def home(request):
     articles = Article.objects.all().order_by("-id")
+    category = request.GET.get("category")
+    if category:
+        articles = articles.filter(category__name=category)
+
+    category_id = request.GET.get("category")
+
+    if category_id:
+        articles = articles.filter(category=category_id)
+
     return render(request, "article_list.html",{"articles":articles})
 
 def article(request,slug):
