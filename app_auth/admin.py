@@ -6,6 +6,8 @@ from app_auth.utils.policy_aggregator import PolicyAggregator
 
 @admin.register(User)
 class AdminUser(admin.ModelAdmin):
+    change_form_template = "admin/register_user.html"
+
     list_display = ("username", "email", "first_name", "last_name")
 
     def __get_managed_roles(self,groups: list) -> list:
