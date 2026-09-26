@@ -1,9 +1,9 @@
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from django.contrib.auth.models import Group, Permission
-from app_auth.utils.policy_utils import PolicyUtils
+from app_auth.services.policy_service import PolicyService
 from app_auth.utils.permission import permission_codename, permission_description
 
 class Command(BaseCommand):
@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
 
-        policies = PolicyUtils.discover_policies()
+        policies = PolicyService.discover_policies()
         
         if not policies:
             self.stdout.write(
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         self.stdout.write("Discovered policies:")
         self.__print_policies(policies)
 
-        final_policy = PolicyUtils.aggregate_policy(policies)
+        final_policy = PolicyService.aggregate_policy(policies)
 
         self.stdout.write("\n=================")
 
@@ -49,8 +49,6 @@ class Command(BaseCommand):
         db_groups = Group.objects.all()
         
         existing_policies=[]
-
-        from pprint import pprint
 
         for db_group in db_groups:
             group_permissions = policy[db_group.name]['permissions']

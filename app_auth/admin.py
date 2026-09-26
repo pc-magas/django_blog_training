@@ -1,6 +1,13 @@
 from django.contrib import admin
+from django.contrib.admin import AdminSite
+from django.contrib.admin.options import _ModelT
+
 from app_auth.models import User
-from app_auth.utils.policy_utils import PolicyUtils
+from app_auth.services.role_service import RoleService
+
+from app_auth.container import Container
+from dependency_injector.wiring import Provide, inject
+
 
 # Register your models here.
 
@@ -9,6 +16,11 @@ class AdminUser(admin.ModelAdmin):
     change_form_template = "admin/register_user.html"
 
     list_display = ("username", "email", "first_name", "last_name")
+
+    @inject
+    def __init__(self, model: type[_ModelT], admin_site: AdminSite, role_service: RoleService = Provide[Container.role_service]):
+        super().__init__(model, admin_site)
+        self.__role_service = role_service
 
     def has_add_permission(self, request):
         return request.user.is_superuser or request.user.has_perm("app_auth.add_user")
@@ -25,7 +37,7 @@ class AdminUser(admin.ModelAdmin):
         if obj is None:
             return True
 
-        return PolicyUtils.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
+        return self.__role_service.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
 
     def has_delete_permission(self, request, obj=None):
         # Don't forget this one: it bypasses your change rules otherwise.
@@ -38,7 +50,7 @@ class AdminUser(admin.ModelAdmin):
         if obj is None:
             return True
 
-        return PolicyUtils.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
+        return self.__role_service.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
 
     def has_module_permission(self, request, obj=None):
 
@@ -74,7 +86,7 @@ class AdminUser(admin.ModelAdmin):
     def get_queryset(self, request):
 
         user_groups = request.user.groups.all().values_list("name", flat=True)
-        managed_roles = PolicyUtils.get_managed_roles(list(user_groups))
+        managed_roles = self.__role_service.get_managed_roles(list(user_groups))
 
         qs = super().get_queryset(request)
 

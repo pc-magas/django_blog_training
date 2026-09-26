@@ -1,7 +1,7 @@
+from dependency_injector.wiring import inject
 from django.apps import apps
 from importlib import import_module
 from app_auth.utils.permission import permission_codename, permission_description
-from django.contrib.auth.models import AbstractUser
 
 DEFAULT_GROUP_POLICY = {
     "is_staff":False,
@@ -9,7 +9,8 @@ DEFAULT_GROUP_POLICY = {
     "permissions":{}
 }
 
-class PolicyUtils():
+#TODO: Split scope Into Seperate Services
+class PolicyService():
 
     @staticmethod
     def discover_policies():
@@ -109,32 +110,6 @@ class PolicyUtils():
 
         return final_policy
     
-    @staticmethod
-    def get_current_policy_aggregated():
-        policies = PolicyUtils.discover_policies()
-        return PolicyUtils.aggregate_policy(policies)
-
-    @staticmethod
-    def get_managed_roles(groups: list) -> list:
-        aggregated_policy = PolicyUtils.get_current_policy_aggregated()
-        aggregated_groups = set()
-        for group in groups:
-
-            if not group in aggregated_policy:
-                continue
-
-            # Aggregated Policy has manage_groups
-            group_managing_roles = aggregated_policy[group]['manage_groups']
-            aggregated_groups.update(group_managing_roles)
-
-        return list(aggregated_groups)
-
-    @staticmethod
-    def user_can_manage_roles( user: AbstractUser, target_roles: set) -> bool:
-        user_groups = user.groups.all().values_list("name", flat=True)
-        managed_roles = PolicyUtils.get_managed_roles(user_groups)
-
-        if not managed_roles:
-            return True
-
-        return bool(target_roles & set(managed_roles))
+    def get_current_policy_aggregated(self):
+        policies = PolicyService.discover_policies()
+        return PolicyService.aggregate_policy(policies)
