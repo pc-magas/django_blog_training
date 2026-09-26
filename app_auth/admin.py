@@ -1,6 +1,6 @@
 from django.contrib import admin
 from app_auth.models import User
-from app_auth.utils.policy_aggregator import PolicyAggregator
+from app_auth.utils.policy_utils import PolicyUtils
 
 # Register your models here.
 
@@ -9,29 +9,6 @@ class AdminUser(admin.ModelAdmin):
     change_form_template = "admin/register_user.html"
 
     list_display = ("username", "email", "first_name", "last_name")
-
-    def __get_managed_roles(self,groups: list) -> list:
-        aggregated_policy = PolicyAggregator.get_current_policy_aggregated()
-        aggregated_groups = set()
-        for group in groups:
-
-            if not group in aggregated_policy:
-                continue
-
-            # Aggregated Policy has manage_groups
-            group_managing_roles = aggregated_policy[group]['manage_groups']
-            aggregated_groups.update(group_managing_roles)
-
-        return list(aggregated_groups)
-
-    def __user_can_manage_roles(self, user: User, target_roles: set) -> bool:
-        user_groups = user.groups.all().values_list("name", flat=True)
-        managed_roles = self.__get_managed_roles(user_groups)
-
-        if not managed_roles :
-            return True
-
-        return bool(target_roles & set(managed_roles))
 
     def has_add_permission(self, request):
         return request.user.is_superuser or request.user.has_perm("app_auth.add_user")
@@ -48,7 +25,7 @@ class AdminUser(admin.ModelAdmin):
         if obj is None:
             return True
 
-        return self.__user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
+        return PolicyUtils.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
 
     def has_delete_permission(self, request, obj=None):
         # Don't forget this one: it bypasses your change rules otherwise.
@@ -61,7 +38,7 @@ class AdminUser(admin.ModelAdmin):
         if obj is None:
             return True
 
-        return self.__user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
+        return PolicyUtils.user_can_manage_roles(request.user, set(obj.groups.values_list("name", flat=True)))
 
     def has_module_permission(self, request, obj=None):
 
@@ -97,7 +74,7 @@ class AdminUser(admin.ModelAdmin):
     def get_queryset(self, request):
 
         user_groups = request.user.groups.all().values_list("name", flat=True)
-        managed_roles = self.__get_managed_roles(list(user_groups))
+        managed_roles = PolicyUtils.get_managed_roles(list(user_groups))
 
         qs = super().get_queryset(request)
 
