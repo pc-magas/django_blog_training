@@ -4,7 +4,7 @@
 {% block extrastyle %}
     {{ block.super }}
 
-    <link rel="stylesheet"  href="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.css" />
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
 
     <style>
         /* Main article layout */
@@ -45,17 +45,21 @@
             padding: 12px 14px;
         }
 
-        /* CKEditor */
-        .article-main .field-content {
-            width: 100%;
+        /* Quill itself */
+        .article-main .field-content > div > .ql-toolbar {
+            flex: 0 0 auto;
         }
 
-        .article-main .field-content .ck-editor {
-            width: 100%;
+        .article-main .field-content > div > .ql-container {
+            flex: 1 1 auto;
+            min-height: 0;
         }
 
-        .article-main .field-content .ck-editor__editable {
-            min-height: 600px;
+        /* Scroll the editor, not the whole page */
+        .article-main .ql-editor {
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
         }
 
         /* Sidebar */
@@ -76,102 +80,102 @@
         }
 
         /* Sidebar */
-.article-sidebar {
-    min-width: 0;
-}
+        .article-sidebar {
+            min-width: 0;
+        }
 
-.article-sidebar .form-row {
-    width: 100%;
-    padding: 0;
-    border-bottom: 0;
-    margin-bottom: 25px;
-}
-
-
-/* Slug */
-.article-sidebar .field-slug input {
-    width: 100%;
-    box-sizing: border-box;
-}
+        .article-sidebar .form-row {
+            width: 100%;
+            padding: 0;
+            border-bottom: 0;
+            margin-bottom: 25px;
+        }
 
 
-/* =========================
-   Category
-   ========================= */
-
-.field-category {
-    width: 100%;
-}
-
-/* Category + button */
-.category-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 8px;
-}
-
-.category-label label {
-    margin: 0;
-    font-weight: 600;
-}
+        /* Slug */
+        .article-sidebar .field-slug input {
+            width: 100%;
+            box-sizing: border-box;
+        }
 
 
-/* + button */
-.add-category {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+        /* =========================
+           Category
+           ========================= */
 
-    width: 20px;
-    height: 20px;
+        .field-category {
+            width: 100%;
+        }
 
-    text-decoration: none;
-}
+        /* Category + button */
+        .category-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
 
-.add-category img {
-    width: 16px;
-    height: 16px;
-}
-
-/* Full width category selector */
-.category-field {
-    width: 100%;
-}
-
-/*
- * If category is a <select>
- */
-.category-field select {
-    width: 100%;
-    box-sizing: border-box;
-}
+        .category-label label {
+            margin: 0;
+            font-weight: 600;
+        }
 
 
-/*
- * If category is a checkbox list
- */
-.category-field ul {
-    width: 100%;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 10px;
-    list-style: none;
+        /* + button */
+        .add-category {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
-    border: 1px solid var(--hairline-color);
-    border-radius: 4px;
-}
+            width: 20px;
+            height: 20px;
 
-.category-field li {
-    padding: 4px 0;
-}
+            text-decoration: none;
+        }
+
+        .add-category img {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Full width category selector */
+        .category-field {
+            width: 100%;
+        }
+
+        /*
+         * If category is a <select>
+         */
+        .category-field select {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+
+        /*
+         * If category is a checkbox list
+         */
+        .category-field ul {
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 10px;
+            list-style: none;
+
+            border: 1px solid var(--hairline-color);
+            border-radius: 4px;
+        }
+
+        .category-field li {
+            padding: 4px 0;
+        }
     </style>
 {% endblock %}
 
 
 {% block extrahead %}
     {{ block.super }}
-   	<script src="https://cdn.ckeditor.com/ckeditor5/48.5.1/ckeditor5.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 {% endblock %}
 
 
@@ -180,49 +184,27 @@
     {{ block.super }}
 
     <script>
-        const {
-            ClassicEditor,
-            Essentials,
-            Bold,
-            Italic,
-            Font,
-            Paragraph
-        } = CKEDITOR;
+        const textareaId = "article-content"
+        const textareaElement = document.getElementById(textareaId);
+        if (textareaElement) {
 
-        const textarea = document.querySelector("#article-content");
-        const LICENSE_KEY = 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3OTA4MTI3OTksImp0aSI6ImQ1ODYzMjZiLTNhYmYtNDMzNC1iZTFhLWUwNjA1YjAyZTBmYiIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJyZW1vdmVGZWF0dXJlcyI6WyJBSSJdLCJ2YyI6ImNjYjZiODBhIn0.MJyRI-YBGwhSRGkGNbDyFy61VsG5TZdS-OzInRfy_SutH-fezgXygUY6iHgkTQOg4v6r_-j_O7fXQ_8PJZrpyA';
+                textareaElement.style.display = 'none';
 
-        if (!textarea) {
-            console.error("Could not find #article-content");
-        } else {
-            ClassicEditor
-                .create(textarea, {
-                    licenseKey: LICENSE_KEY,
-                    plugins: [
-                        Essentials,
-                        Paragraph,
-                        Bold,
-                        Italic
-                    ],
-                    toolbar: [
-                        "undo",
-                        "redo",
-                        "|",
-                        "bold",
-                        "italic",
-                        "link",
-                        "|",
-                        "bulletedList",
-                        "numberedList"
-                    ]
-                })
-                .then(editor => {
-                    console.log("CKEditor initialized", editor);
-                })
-                .catch(error => {
-                    console.error("CKEditor initialization failed:", error);
+                const quillDiv = document.createElement('div');
+                quillDiv.id = textareaId + '-quill';
+                quillDiv.style.height="100%"
+                textareaElement.parentNode.insertBefore(quillDiv, textareaElement.nextSibling);
+
+                const quill = new Quill('#' + quillDiv.id, {
+                    theme: 'snow'
                 });
-        }
+
+                quill.on('text-change', function() {
+                    textareaElement.value = quill.root.innerHTML;
+                });
+            } else {
+                console.error(`Element with id #article-content not found.`);
+            }
     </script>
 {% endblock %}
 
@@ -248,38 +230,37 @@
 
     </main>
 
-
     <aside class="article-sidebar">
 
-    {{ adminform.form.slug.errors }}
-    <div class="form-row field-slug">
-        {{ adminform.form.slug.label_tag }}
-        <div>
-            {{ adminform.form.slug }}
-        </div>
-    </div>
-
-
-    {{ adminform.form.category.errors }}
-    <div class="form-row field-category">
-
-        <div class="category-label">
-            <label for="{{ adminform.form.category.id_for_label }}">
-                Category
-            </label>
-
-            <a href="{% url 'admin:blog_category_add' %}"
-               class="add-category"
-               onclick="return showAddAnotherPopup(this);"
-               title="Add category"
-               aria-label="Add category">
-                <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="">
-            </a>
+        {{ adminform.form.slug.errors }}
+        <div class="form-row field-slug">
+            {{ adminform.form.slug.label_tag }}
+            <div>
+                {{ adminform.form.slug }}
+            </div>
         </div>
 
-        <div class="category-field" style="width: 100%">
-            {{ adminform.form.category }}
-        </div>
+
+        {{ adminform.form.category.errors }}
+        <div class="form-row field-category">
+
+            <div class="category-label">
+                <label for="{{ adminform.form.category.id_for_label }}">
+                    Category
+                </label>
+
+                <a href="{% url 'admin:blog_category_add' %}"
+                   class="add-category"
+                   onclick="return showAddAnotherPopup(this);"
+                   title="Add category"
+                   aria-label="Add category">
+                    <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="">
+                </a>
+            </div>
+
+            <div class="category-field" style="width: 100%">
+                {{ adminform.form.category }}
+            </div>
 
     </div>
 
