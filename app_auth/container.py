@@ -1,16 +1,21 @@
 from dependency_injector import containers, providers
-from .services.role_service import RoleService
-from .services.policy_service import PolicyService
+
+from app_auth.services.save.user import UserService
+from app_auth.services.group_service import GroupService
+from app_auth.services.policy_service import PolicyService
 
 
 class Container(containers.DeclarativeContainer):
-
     config = providers.Configuration()
 
-    policy = providers.Singleton(PolicyService)
+    policy_service = providers.Singleton(PolicyService)
 
-    role = providers.Factory(
-        RoleService,
-        policy_service=policy
+    group_service = providers.Singleton(
+        GroupService,
+        policy_service=policy_service
     )
 
+    user_service = providers.Singleton(
+        UserService,
+        group_service=group_service
+    )

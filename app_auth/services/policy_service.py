@@ -106,6 +106,9 @@ class PolicyService:
                     "manage_groups":list(set(existing_policy['manage_groups'])|set(group_policy['manage_groups']))
                 }
 
+                if final_group_policy['is_superuser']:
+                    final_group_policy['is_staff'] = True
+
                 final_policy[group]=final_group_policy
 
         return final_policy
