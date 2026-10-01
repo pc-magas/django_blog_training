@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.admin import AdminSite
-from django.contrib.admin.options import _ModelT
 
 from app_auth.models import User
 from app_auth.services.role_service import RoleService
@@ -18,7 +17,7 @@ class AdminUser(admin.ModelAdmin):
     list_display = ("username", "email", "first_name", "last_name")
 
     @inject
-    def __init__(self, model: type[_ModelT], admin_site: AdminSite, role_service: RoleService = Provide[Container.role_service]):
+    def __init__(self, model, admin_site: AdminSite, role_service: RoleService = Provide[Container.role]):
         super().__init__(model, admin_site)
         self.__role_service = role_service
 

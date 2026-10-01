@@ -1,9 +1,13 @@
 from django.apps import AppConfig
-from app_auth import container
 
 class AppAuthConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'app_auth'
 
+    container = None
+
     def ready(self):
-        container.wire(modules=[".views"])
+        from .container import Container  # import here, not at module top
+        AppAuthConfig.container = Container()
+        AppAuthConfig.container.wire(modules=[".views"])
+        AppAuthConfig.container.wire(modules=[".admin"])

@@ -10,7 +10,7 @@ DEFAULT_GROUP_POLICY = {
 }
 
 #TODO: Split scope Into Seperate Services
-class PolicyService():
+class PolicyService:
 
     @staticmethod
     def discover_policies():

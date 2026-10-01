@@ -1,13 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from app_auth.services.policy_service import PolicyService
 
-from app_auth.container import Container
-from dependency_injector.wiring import Provide, inject
+class RoleService:
 
-class RoleService():
-
-    @inject
-    def __init__(self, policy_service:PolicyService = Provide[Container.policy_service] ):
+    def __init__(self, policy_service:PolicyService ):
         self.__policy_service = policy_service
 
     def get_managed_roles(self,groups: list) -> list:
