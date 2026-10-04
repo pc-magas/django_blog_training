@@ -2,9 +2,11 @@ from app_auth.models import User
 from django.contrib.auth.models import Group
 
 from app_auth.services.group_service import GroupService
+from injector import inject
 
 class UserService:
 
+    @inject
     def __init__(self, group_service: GroupService):
         self.__group_service = group_service
 

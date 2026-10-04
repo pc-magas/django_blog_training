@@ -1,34 +1,33 @@
 from django.contrib import admin
-from django.contrib.admin import AdminSite
 from django.core.exceptions import ValidationError
-
-from app_auth.container import Container
-from dependency_injector.wiring import Provide, inject
-
+from django.apps import apps
 
 from app_auth.models import User
 from app_auth.services.group_service import GroupService
 from app_auth.services.save.user import UserService
+from app_auth.forms import UserForm
 
 
 # Register your models here.
 
 @admin.register(User)
 class AdminUser(admin.ModelAdmin):
+
+    form = UserForm
     change_form_template = "admin/register_user.html"
 
     list_display = ("username", "email", "first_name", "last_name")
 
-    @inject
-    def __init__(self,
-                 model,
-                 admin_site: AdminSite,
-                 group_service: GroupService = Provide[Container.group_service],
-                 user_service: UserService = Provide[Container.user_service],
-    ):
-        super().__init__(model, admin_site)
-        self.__group_service = group_service
-        self.__user_service = user_service
+
+    @property
+    def __group_service(self) -> GroupService:
+        injector = apps.get_app_config("django_injector").injector
+        return injector.get(GroupService)
+
+    @property
+    def __user_service(self) -> UserService:
+        injector = apps.get_app_config("django_injector").injector
+        return injector.get(UserService)
 
     def has_add_permission(self, request):
         return request.user.is_superuser or request.user.has_perm("app_auth.add_user")
@@ -104,10 +103,12 @@ class AdminUser(admin.ModelAdmin):
 
         return qs
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj: User, form, change):
+
         # Check whether current user can manage roles
         groups = form.cleaned_data.get("groups")
-
+        from pprint import pprint
+        pprint(groups)
         if not self.__group_service.user_can_manage_groups(request.user, set(groups)):
             raise ValidationError(
                 "You do not have permission to manage these groups."
@@ -126,7 +127,6 @@ class AdminUser(admin.ModelAdmin):
             return
 
         self.__user_service.create(
-            user=obj,
             username=form.cleaned_data["username"],
             email=form.cleaned_data["email"],
             first_name=form.cleaned_data["first_name"],

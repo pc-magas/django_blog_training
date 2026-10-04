@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser, Group
 from app_auth.services.policy_service import PolicyService
+from injector import inject
 
 
 class GroupService:
 
+    @inject
     def __init__(self, policy_service:PolicyService ):
         self.__policy_service = policy_service
 

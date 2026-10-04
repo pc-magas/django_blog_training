@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    bio = models.TextField()
+    bio = models.TextField(blank=True)
 
     def __str__(self):
         return self.first_name+' '+self.last_name

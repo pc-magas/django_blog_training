@@ -1,4 +1,3 @@
-from dependency_injector.wiring import inject
 from django.apps import apps
 from importlib import import_module
 from app_auth.utils.permission import permission_codename, permission_description

@@ -2,10 +2,12 @@
 
 {% block field_sets %}
 
+    {{ adminform.form.non_field_errors }}
+
     <div class="form-row">
-        {{ adminform.form.username.errors }}
         {{ adminform.form.username.label_tag }}
         {{ adminform.form.username }}
+        {{ adminform.form.username.errors }}
     </div>
 
     <div class="form-row">
@@ -30,6 +32,12 @@
         {{ adminform.form.groups.label_tag }}
         {{ adminform.form.groups }}
         {{ adminform.form.groups.errors }}
+    </div>
+
+    <div class="form-row">
+        {{ adminform.form.bio.label_tag }}
+        {{ adminform.form.bio }}
+        {{ adminform.form.bio.errors }}
     </div>
 
 {% endblock %}

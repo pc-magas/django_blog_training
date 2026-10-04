@@ -7,7 +7,4 @@ class AppAuthConfig(AppConfig):
     container = None
 
     def ready(self):
-        from .container import Container  # import here, not at module top
-        AppAuthConfig.container = Container()
-        AppAuthConfig.container.wire(modules=[".views"])
-        AppAuthConfig.container.wire(modules=[".admin"])
+        pass
