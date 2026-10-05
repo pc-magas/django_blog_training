@@ -1,11 +1,18 @@
 from app_auth.models import User
 from django import forms
+from django.contrib.auth.models import Group
 
-class UserForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    class Meta:
-        model = User
-        fields = ["username","first_name", "last_name", "groups","bio"]
+class UserForm(forms.Form):
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
+    groups = forms.ModelMultipleChoiceField(
+        queryset=Group.objects.all(),
+        required=False,
+    )
+    bio = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+    )
 

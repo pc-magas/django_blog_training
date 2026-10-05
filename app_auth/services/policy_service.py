@@ -76,12 +76,10 @@ class PolicyService:
 
     @staticmethod
     def aggregate_policy(policies)->dict:
-        from pprint import pprint
 
         final_policy = {}
 
         for group_name, policy in policies.items():
-            pprint(policy)
 
             for group,group_policy in policy.items():
                 
