@@ -21,26 +21,9 @@ class UserService:
                groups: list[Group],
                bio: str | None = None) -> User:
 
-        is_superuser = self.__group_service.user_can_be_superuser(groups)
-        is_staff = is_superuser
+        user = self.__save(User(), username, email, first_name, last_name, groups, bio)
 
-        if not is_superuser:
-            is_staff = self.__group_service.user_can_be_staff(groups)
-
-        user = User.objects.create_user(
-            username=username,
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            bio=bio, #TODO: XSS Sanitize
-            is_superuser=is_superuser,
-            is_staff=is_staff,
-        )
-
-        user.save()
-
-        user.groups.set(groups)
-        user.save()
+        # TODO: Send an email towards user in order to activate his account.
 
         return user
 
@@ -64,6 +47,13 @@ class UserService:
                roles: list[str | Group],
                bio: str|None = None
                ) -> User:
+
+        is_superuser = self.__group_service.user_can_be_superuser(groups)
+        is_staff = is_superuser
+
+        if not is_superuser:
+            is_staff = self.__group_service.user_can_be_staff(groups)
+
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
@@ -85,5 +75,6 @@ class UserService:
 
         user.groups.set(groups)
 
-        user.save(groups=groups)
+        user.save()
+
         return user
