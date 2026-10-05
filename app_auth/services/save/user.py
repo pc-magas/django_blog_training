@@ -12,7 +12,6 @@ class UserService:
         self.__group_service = group_service
 
 
-    @transaction.atomic
     def create(self,
                username: str,
                email: str,
@@ -33,26 +32,21 @@ class UserService:
                email: str,
                first_name: str,
                last_name: str,
-               roles: list[str | Group],
+               groups: list[str | Group],
                bio: str|None = None) -> User:
-        user = self.__save(user, username, email, first_name, last_name, roles,bio)
+        user = self.__save(user, username, email, first_name, last_name, groups, bio)
         return user
 
+    @transaction.atomic
     def __save(self,
                user: User,
                username: str,
                email: str,
                first_name: str,
                last_name: str,
-               roles: list[str | Group],
+               groups: list[str | Group],
                bio: str|None = None
                ) -> User:
-
-        is_superuser = self.__group_service.user_can_be_superuser(groups)
-        is_staff = is_superuser
-
-        if not is_superuser:
-            is_staff = self.__group_service.user_can_be_staff(groups)
 
         user.first_name = first_name
         user.last_name = last_name
@@ -62,18 +56,19 @@ class UserService:
         # TODO: XSS SANITIZE
         user.bio = bio
 
-        is_superuser = self.__group_service.user_can_be_superuser(roles)
+        is_superuser = self.__group_service.user_can_be_superuser(groups)
         is_staff = is_superuser
 
         if not is_superuser:
-            is_staff = self.__group_service.user_can_be_staff(roles)
+            is_staff = self.__group_service.user_can_be_staff(groups)
 
         user.is_superuser = is_superuser
         user.is_staff = is_staff
 
-        groups = self.__group_service.get_groups(roles)
+        user.save()
 
-        user.groups.set(groups)
+        group_models = self.__group_service.get_groups(groups)
+        user.groups.set(group_models)
 
         user.save()
 
