@@ -104,25 +104,7 @@ class AdminUser(admin.ModelAdmin):
 
         return qs
 
-    def add_view(self, request, form_url="", extra_context=None):
-        if request.method == "POST":
-            form = UserForm(request.POST)
-            if form.is_valid():
-                self.__user_service.create(
-                    username=form.cleaned_data["username"],
-                    email=form.cleaned_data["email"],
-                    first_name=form.cleaned_data["first_name"],
-                    last_name=form.cleaned_data["last_name"],
-                    groups=form.cleaned_data["groups"],
-                    bio=form.cleaned_data.get("bio"),
-                )
-
-                self.message_user(
-                    request,
-                    "User created successfully.",
-                )
-        else:
-            form = UserForm()
+    def __render_add_change_form(self,form :UserForm,request,form_url="",extra_context=None,change:bool=False)->TemplateResponse:
 
         fieldsets = [(None, {"fields": list(form.fields)})]
         adminform = helpers.AdminForm(
@@ -139,8 +121,8 @@ class AdminUser(admin.ModelAdmin):
             "adminform": adminform,
             "errors": helpers.AdminErrorList(form, []),
             "media": self.media + adminform.media,
-            "add": True,
-            "change": False,
+            "add": not change,
+            "change": change,
             "is_popup": False,
             "save_as": False,
             "save_on_top": False,
@@ -162,6 +144,29 @@ class AdminUser(admin.ModelAdmin):
         }
 
         return TemplateResponse(request, self.change_form_template, context)
+
+
+    def add_view(self, request, form_url="", extra_context=None):
+        if request.method == "POST":
+            form = UserForm(request.POST)
+            if form.is_valid():
+                self.__user_service.create(
+                    username=form.cleaned_data["username"],
+                    email=form.cleaned_data["email"],
+                    first_name=form.cleaned_data["first_name"],
+                    last_name=form.cleaned_data["last_name"],
+                    groups=form.cleaned_data["groups"],
+                    bio=form.cleaned_data.get("bio"),
+                )
+
+                self.message_user(
+                    request,
+                    "User created successfully.",
+                )
+        else:
+            form = UserForm()
+
+        return self.__render_add_change_form(form,request=request,extra_context=extra_context)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         obj = self.get_object(request, object_id)
@@ -193,41 +198,4 @@ class AdminUser(admin.ModelAdmin):
         else:
             form = UserForm(instance=obj)
 
-        fieldsets = [(None, {"fields": list(form.fields)})]
-        adminform = helpers.AdminForm(
-            form,
-            fieldsets,
-            prepopulated_fields={},
-            readonly_fields=[],
-            model_admin=self,
-        )
-
-        context = {
-            **self.admin_site.each_context(request),
-            "opts": self.model._meta,
-            "adminform": adminform,
-            "errors": helpers.AdminErrorList(form, []),
-            "media": self.media + adminform.media,
-            "add": True,
-            "change": False,
-            "is_popup": False,
-            "save_as": False,
-            "save_on_top": False,
-            "show_save": True,
-            "show_save_and_continue": False,
-            "show_save_and_add_another": False,
-            "show_delete_link": False,
-            "show_close": False,
-            "has_add_permission": self.has_add_permission(request),
-            "has_change_permission": self.has_change_permission(request),
-            "has_view_permission": self.has_view_permission(request),
-            "has_delete_permission": self.has_delete_permission(request),
-            "has_editable_inline_admin_formsets": False,
-            "inline_admin_formsets": [],
-            "form_url": form_url,
-            "title": "Add user",
-            "app_label": self.model._meta.app_label,
-            **(extra_context or {}),
-        }
-
-        return TemplateResponse(request, self.change_form_template, context)
+        return self.__render_add_change_form(form, request=request, extra_context=extra_context,change=True)
