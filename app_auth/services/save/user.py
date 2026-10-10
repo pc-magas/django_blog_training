@@ -1,6 +1,10 @@
 from app_auth.models import User
 from django.contrib.auth.models import Group
 
+# TODO: Make an Email Service maybe???
+from django.core.mail import send_mail
+
+
 from app_auth.services.group_service import GroupService
 from injector import inject
 from django.db import transaction
@@ -22,7 +26,13 @@ class UserService:
 
         user = self.__save(User(), username, email, first_name, last_name, groups, bio)
 
-        # TODO: Send an email towards user in order to activate his account.
+        # TODO: Make an Email Service for sending the emails towards the user
+        send_mail(
+            "Activate your account",
+            "Activate your account",
+            "from@example.com",
+            [user.email],
+        )
 
         return user
 

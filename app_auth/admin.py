@@ -19,10 +19,9 @@ class AdminUser(CustomAdminFormMixin,admin.ModelAdmin):
 
     list_display = ("username", "email", "first_name", "last_name")
 
-
     @property
     def __group_service(self) -> GroupService:
-        injector = apps.get_app_config("django_injector").injector
+        injector =  apps.get_app_config("django_injector").injector
         return injector.get(GroupService)
 
     @property
