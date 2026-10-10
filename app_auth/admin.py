@@ -6,8 +6,6 @@ from app_auth.models import User
 from app_auth.services.group_service import GroupService
 from app_auth.services.save.user import UserService
 from app_auth.forms import UserForm
-from django.contrib.admin import helpers
-from django.template.response import TemplateResponse
 
 from common.admin.mixins import CustomAdminFormMixin
 

@@ -2,10 +2,8 @@
 
 Each app should contain a folder named `auth` with these files:
 
-* `permissions.py` that defines all app permission into a deistinct variables
 * `groups.py` that defines all app groups into distinct variables
 * `policy.py` that defines what permissions each group should have.
-
 
 ## Assign group Permission
 
@@ -13,7 +11,7 @@ Each app should contain a folder named `auth` with these files:
 
 For example:
 
-```
+```python
 AUTHOR="author"
 EDITOR="editor"
 ```
@@ -26,31 +24,51 @@ Each app has a `policy.py` that defines which permissions a group should have.
 
 For example:
 
-```
+```python
 from .groups import AUTHOR, EDITOR
-from .permissions import (
-    CREATE_ARTICLE,
-    UPDATE_ARTICLE,
-    DELETE_ARTICLE,
-)
 
-GROUP_PERMISSIONS = {
+POLICY = {
     AUTHOR: {
-        CREATE_ARTICLE,
+        "is_staff":True,
+        "permissions":{
+            "add_article",
+            "change_article",
+            "delete_article",
+            "view_article"
+        }
     },
     EDITOR: {
-        CREATE_ARTICLE,
-        UPDATE_ARTICLE,
+        "is_staff":True,
+        "is_superuser":True,
+        "permissions":{
+            "change_article",
+            "view_article",
+            "add_user",
+            "change_user"
+            "delete_user"
+        },
+        "manage_groups":{
+            AUTHOR
+        }
     },
 }
 ```
 
+The policy is a dict containing:
 
-### Step 3: Assign Policies upon models:
+* `is_staff`: An indication whether this group can have access on Django Admin
+* `is_admin`: An indication whether this group can have access on Django Admin as admi user
+* `permissions`: a list of permissions a user can have
+* `manage_groups`: a list of allowed users belonging to the groups is allowed. 
+  In order to manage user also should have one of the following permissions:
+  * `add_user`
+  * `change_user`
+  * `delete_user`
 
-Then upon model you can assign your permissions:
+Permissions are strings and can contain the default that django creates and stored upon `auth_permission`.
+If you are creating your own place place them as meta upon the model for example:
 
-```
+```python
 
 class Article(models.Model):
     id=models.AutoField(primary_key=True)
@@ -67,29 +85,109 @@ class Article(models.Model):
         ]
 ```
 
-Keep in mind that django upon each model assigns default permissions. Consult `auth_permission` and `django_content_type` for the available permissions.
+And run:
 
-#### Step 4: Save permissions into db:
-
-```
+```commandline
 python manage.py makemigration
 python manage.py migrate
+```
+
+#### Step 3: Create groups and assign permission into each group:
+
+Every time you create or update policy please run
+
+```commandline
 python manage.py sync_group_policies
 ```
 
-## Update Model permissions
+# Availabvle Services
 
-Once you add a new permission upon a model run:
+## Policy service
 
-```
-python manage.py makemigration
-python manage.py migrate
+The command:
+
+```commandline
 python manage.py sync_group_policies
 ```
 
+Uses the library `app_auth.services.PolicyService`, this is an injectable service that iterates all available policies and aggregates them into a single dict.
+In order to use it you can injects them into your service:
 
-## Miscelanmous Notes:
-1. The `sync_group_policies` would assign a permission upon group only if:
-   1. A permission is assigned into a model as well.
-   2. A permission is assigned ionto a group upon `auth/policy.py`
-2. The django framework itself generates default permissions for each model. These permissions are not defined at `auth/permissions.py` unless you define them.
+```python
+
+from injector import inject
+from app_auth.services.policy_service import PolicyService
+
+
+class Myservice:
+
+    @inject
+    def __init__(self, policy_service:PolicyService ):
+        self.__policy_service = policy_service
+
+    # Get the policy
+    def my_function(self):
+        policy = self.__policy_service.get_current_policy_aggregated()
+        # Do stuff here
+```
+
+Keep in mind that upon admin you need to fetch the service from service container for example:
+
+```python
+from django.contrib import admin
+from django.apps import apps
+from django.http.response import Http404
+from app_auth.models import User
+from app_auth.services.policy_service import PolicyService
+
+@admin.register(User)
+class AdminUser(admin.ModelAdmin):
+
+    @property
+    def __policy_service(self) -> PolicyService:
+        injector = apps.get_app_config("django_injector").injector
+        return injector.get(PolicyService)
+
+```
+
+# Group service
+
+Using `PolicyService` in order to manage groups though id kinda tedious. Common utilities regarding the  django groups and what are cappable of exist into `GroupService`.
+
+You can use it by injecting into your service:
+
+```python
+
+from injector import inject
+from app_auth.services.group_service import GroupService
+
+
+class Myservice:
+
+    @inject
+    def __init__(self, group_service:GroupService ):
+        self.__group_service = group_service
+
+    # Get the policy
+    def my_function(self):
+        groups = self.__group_service.get_managed_groups(["ADMIN"])
+        # Do stuff here
+```
+
+Keep in mind that upon admin you need to fetch the service from service container for example:
+
+```python
+from django.contrib import admin
+from django.apps import apps
+from django.http.response import Http404
+from app_auth.models import User
+from app_auth.services.group_service import GroupService
+
+@admin.register(User)
+class AdminUser(admin.ModelAdmin):
+
+    @property
+    def __group_service(self) -> GroupService:
+        injector = apps.get_app_config("django_injector").injector
+        return injector.get(GroupService)
+```

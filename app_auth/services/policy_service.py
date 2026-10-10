@@ -110,6 +110,6 @@ class PolicyService:
 
         return final_policy
     
-    def get_current_policy_aggregated(self):
+    def get_current_policy_aggregated(self)->dict:
         policies = PolicyService.discover_policies()
         return PolicyService.aggregate_policy(policies)
