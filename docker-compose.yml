@@ -1,0 +1,26 @@
+services:
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - 8025:8025
+    networks:
+      - dev
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    restart: on-failure
+
+  django:
+    image: python:3.13-slim
+    command: sh -c "cd /app && pip install -r requirements.txt && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mailer
+    networks:
+      - dev
+
+networks:
+  dev:
