@@ -1,1 +1,46 @@
-{% extends "common/base.html" %}
+{% extends "common/base_center.html" %}
+{% load static %}
+
+{% block title %}Complete registration{% endblock %}
+
+{% block extrastyles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    {% if validlink %}
+      <h2>Complete your registration</h2>
+      <p>Choose a password to finish setting up your account.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="form-errors">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="form-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+
+            {% if field.help_text %}
+              <div class="form-help">{{ field.help_text|safe }}</div>
+            {% endif %}
+
+            {% for error in field.errors %}
+              <div class="form-error">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Set password</button>
+      </form>
+    {% else %}
+      <h2>Link no longer valid</h2>
+      <p>This registration link is invalid or has already been used. Please request a new one.</p>
+    {% endif %}
+  </div>
+{% endblock %}

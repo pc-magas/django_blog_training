@@ -1,0 +1,59 @@
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 24px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 22px;
+}
+
+.form-field {
+  margin-bottom: 18px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+.form-help {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #777;
+}
+
+.form-help ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.form-error,
+.form-errors {
+  margin-top: 6px;
+  color: #b00020;
+  font-size: 13px;
+}
+
+.btn {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #0052a3;
+}
