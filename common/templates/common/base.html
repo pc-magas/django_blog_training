@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}My Website{% endblock %}</title>
+
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  {% block extrastyles %}{% endblock %}
+  {% block headerscripts %}{% endblock %}
+</head>
+
+<body>
+  {% block header %}
+    <header>
+      <h1>{% block site_name %}My Website{% endblock %}</h1>
+    </header>
+  {% endblock %}
+
+  {% block layout %}{% endblock %}
+
+  {% block footerscripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block extrastyles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/layout-center.css' %}">
+{% endblock %}
+
+{% block layout %}
+  <div class="container container--center">
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+{% endblock %}

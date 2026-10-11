@@ -1,0 +1,18 @@
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block extrastyles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/layout-sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+{% endblock %}
+
+{% block layout %}
+  <div class="container container--with-sidebar">
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block sidebar %}{% endblock %}
+  </div>
+{% endblock %}

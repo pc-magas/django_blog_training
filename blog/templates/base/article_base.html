@@ -1,0 +1,18 @@
+{% extends "common/base.html" %}
+{% load static %}
+
+{% block site_name %}My Articles{% endblock %}
+
+{% block extrastyles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/layout-sidebar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/articles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+{% endblock %}
+
+{% block container_class %}container--with-sidebar{% endblock %}
+
+{% block sidebar %}
+  {% load widgets.categories_widget %}
+  {% categories_widget %}
+{% endblock %}

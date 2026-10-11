@@ -1,0 +1,15 @@
+.container--with-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
+}
+
+@media (max-width: 700px) {
+  .container--with-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .container--with-sidebar .sidebar {
+    order: -1;
+  }
+}

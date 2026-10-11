@@ -1,0 +1,36 @@
+.sidebar {
+  background: white;
+  border: 1px solid #ddd;
+  padding: 24px;
+  align-self: start;
+}
+
+.sidebar h2 {
+  margin: 0 0 20px;
+  font-size: 18px;
+}
+
+.categories {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.categories li {
+  border-bottom: 1px solid #eee;
+}
+
+.categories li:last-child {
+  border-bottom: none;
+}
+
+.categories a {
+  display: block;
+  padding: 10px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.categories a:hover {
+  color: #0066cc;
+}
