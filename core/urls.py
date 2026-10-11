@@ -18,10 +18,11 @@ from django.contrib import admin
 from django.urls import path,include
 
 admin.site.site_header = "Blog Admin Panel"
-admin.site.index_title = "Manage youyr blog"
+admin.site.index_title = "Manage your blog"
 admin.site.site_title = "Blog Admin Portal"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("", include("app_auth.urls")),
     path("", include("blog.urls")),
 ]

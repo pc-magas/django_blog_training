@@ -1,0 +1,67 @@
+{# emails/complete_registration.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Complete your registration</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f5f7; padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+               style="max-width:560px; background-color:#ffffff; border-radius:8px; font-family:Arial, Helvetica, sans-serif; color:#222222;">
+          <tr>
+            <td style="padding:32px 32px 8px 32px;">
+              <h1 style="margin:0; font-size:22px; line-height:28px;">
+                Welcome{% if user.first_name %}, {{ user.first_name }}{% endif %}!
+              </h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 32px 0 32px; font-size:16px; line-height:24px;">
+              <p style="margin:0 0 16px 0;">
+                An account has been created for you. To finish setting it up,
+                choose a password using the button below.
+              </p>
+              <p style="margin:0 0 16px 0;">
+                Your username is <strong>{{ user.username }}</strong>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:8px 32px 24px 32px;">
+              <a href="{{ link }}"
+                 style="display:inline-block; padding:12px 28px; background-color:#2563eb; color:#ffffff;
+                        font-size:16px; font-weight:bold; text-decoration:none; border-radius:6px;">
+                Complete registration
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 32px 24px 32px; font-size:14px; line-height:20px; color:#555555;">
+              <p style="margin:0 0 12px 0;">
+                This link can be used once and expires in {{ expiry_hours }} hours.
+                If it has expired, ask an administrator to send you a new one.
+              </p>
+              <p style="margin:0 0 12px 0;">
+                If the button doesn't work, copy and paste this address into your browser:
+              </p>
+              <p style="margin:0; word-break:break-all;">
+                <a href="{{ link }}" style="color:#2563eb;">{{ link }}</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 32px 32px 32px; border-top:1px solid #eeeeee; font-size:12px; line-height:18px; color:#888888;">
+              If you weren't expecting this email, you can safely ignore it.
+              No changes will be made to your account.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
