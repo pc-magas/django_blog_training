@@ -65,7 +65,7 @@ class UserService:
         user = self.__save(user, username, email, first_name, last_name, groups, bio)
         user.is_active = False
 
-        transaction.on_commit(lambda: self.__email_service.send_registration_emai(user))
+        transaction.on_commit(lambda: self.__email_service.send_registration_email(user))
 
         return user
 

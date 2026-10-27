@@ -2,17 +2,14 @@
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
-from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib import messages
 
 from injector import inject
 
-from services.save.user import UserService
+from app_auth.services.save.user import UserService
 
 User = get_user_model()
-
 
 @inject
 def complete_registration(request, uidb64, token, user_service: UserService):
