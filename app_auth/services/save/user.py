@@ -17,7 +17,7 @@ class UserService:
         self.__group_service = group_service
         self.__email_service = email_service
 
-    def get_user_pending_for_registration_complete(self,uidb64:str,token:str)->User:
+    def get_user_pending_for_registration_complete(self, uidb64:str, token:str)->User:
 
         try:
             uid = urlsafe_base64_decode(uidb64).decode()

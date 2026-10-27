@@ -13,14 +13,15 @@ from services.save.user import UserService
 
 User = get_user_model()
 
+
 @inject
-def complete_registration(request, uidb64, token,user_service: UserService):
+def complete_registration(request, uidb64, token, user_service: UserService):
     """
     Complete registration by validating the token, setting a password,
     and updating additional user fields.
     """
 
-    user = user_service.get_user_pending_for_registration_complete(uidb64,token)
+    user = user_service.get_user_pending_for_registration_complete(uidb64, token)
     if user is None:
         return redirect("/")
 
@@ -29,22 +30,10 @@ def complete_registration(request, uidb64, token,user_service: UserService):
         form = SetPasswordForm(user, request.POST)
 
         if form.is_valid():
-
-            if form.cleaned_data["new_password1"] != form.cleaned_data["new_password2"]:
-                return render(
-                    request,
-                    "app_auth/complete_registration.html",
-                    {
-                        "form": form,
-                        "validlink": False,
-                        "title": "Complete Registration",
-                        "desc": "Set your password and complete your profile.",
-                    },
-                )
-
             user_service.complete_registration(
                 user=user,
                 password=form.cleaned_data["new_password1"],
+                token=token
             )
 
             messages.success(
