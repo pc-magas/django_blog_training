@@ -21,7 +21,7 @@ dependencies = [
 default-groups = ["dev"]
 
 [dependency-groups]
-dev = ["pytest"]
+dev = ["pytest","debugpy"]
 
 [project.scripts]
 app = "app:main"
