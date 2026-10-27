@@ -1,0 +1,99 @@
+{# emails/welcome.html #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome aboard!</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f4f5f7;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+         style="background-color:#f4f5f7; padding:24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+               style="max-width:560px; background-color:#ffffff; border-radius:8px;
+                      font-family:Arial, Helvetica, sans-serif; color:#222222;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:32px 32px 8px 32px;">
+              <h1 style="margin:0; font-size:24px; line-height:32px;">
+                Welcome aboard{% if user.first_name %}, {{ user.first_name }}{% endif %}!
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Main message -->
+          <tr>
+            <td style="padding:8px 32px 16px 32px; font-size:16px; line-height:24px;">
+              <p style="margin:0 0 16px 0;">
+                Your registration is complete, and your account is ready to use.
+                We're delighted to have you with us!
+              </p>
+
+              <p style="margin:0 0 16px 0;">
+                You can now sign in using your account credentials.
+              </p>
+
+              <p style="margin:0 0 8px 0;">
+                Your username:
+              </p>
+
+              <p style="margin:0 0 16px 0; padding:12px 16px;
+                        background-color:#f4f5f7; border-radius:6px;">
+                <strong>{{ user.username }}</strong>
+              </p>
+
+              <p style="margin:0;">
+                Click the button below to access your account.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Login button -->
+          <tr>
+            <td align="center" style="padding:8px 32px 24px 32px;">
+              <a href="{{ login_link }}"
+                 style="display:inline-block; padding:12px 28px;
+                        background-color:#2563eb; color:#ffffff;
+                        font-size:16px; font-weight:bold;
+                        text-decoration:none; border-radius:6px;">
+                Go to Login
+              </a>
+            </td>
+          </tr>
+
+          <!-- Alternative login link -->
+          <tr>
+            <td style="padding:0 32px 24px 32px; font-size:14px;
+                       line-height:20px; color:#555555;">
+              <p style="margin:0 0 12px 0;">
+                If the button doesn't work, copy and paste this address
+                into your browser:
+              </p>
+
+              <p style="margin:0; word-break:break-all;">
+                <a href="{{ login_link }}" style="color:#2563eb;">
+                  {{ login_link }}
+                </a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:16px 32px 32px 32px;
+                       border-top:1px solid #eeeeee;
+                       font-size:12px; line-height:18px; color:#888888;">
+              Your account has been successfully registered.
+              For assistance, please contact your administrator.
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

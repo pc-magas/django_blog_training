@@ -1,7 +1,7 @@
 {% extends "common/base_center.html" %}
 {% load static %}
 
-{% block title %}Complete registration{% endblock %}
+{% block title %}{% block page_title %}Complete registration{% endblock %}{% endblock %}
 
 {% block extrastyles %}
   {{ block.super }}
@@ -11,8 +11,8 @@
 {% block content %}
   <div class="card">
     {% if validlink %}
-      <h2>Complete your registration</h2>
-      <p>Choose a password to finish setting up your account.</p>
+      <h2>{% block heading %}Complete registration{% endblock %}</h2>
+      <p>{% block description %}Choose a password to finish setting up your account.{% endblock %}</p>
 
       <form method="post" novalidate>
         {% csrf_token %}
@@ -40,7 +40,7 @@
       </form>
     {% else %}
       <h2>Link no longer valid</h2>
-      <p>This registration link is invalid or has already been used. Please request a new one.</p>
+      <p>This link is invalid or has already been used. Please request a new one.</p>
     {% endif %}
   </div>
 {% endblock %}

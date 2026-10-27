@@ -14,13 +14,31 @@ from django.conf import settings
 from django.db import transaction
 
 from app_auth.services.group_service import GroupService
+from app_auth.services.email import EmailService
+
 from injector import inject
+
+
 
 class UserService:
 
     @inject
-    def __init__(self, group_service: GroupService):
+    def __init__(self, group_service: GroupService, email_service: EmailService):
         self.__group_service = group_service
+        self.__email_service = email_service
+
+    @transaction.atomic
+    def complete_registration(self,user:User,password:str)->None:
+
+        if user.has_usable_password():
+            raise ValueError("User already completed registration.")
+
+        # set password here
+
+        # Mark user as active
+        user.is_active = True
+
+        transaction.on_commit(lambda: self.__email_service.complete_registration(user))
 
 
     @transaction.atomic
@@ -31,12 +49,13 @@ class UserService:
                last_name: str,
                groups: list[Group],
                bio: str | None = None) -> User:
+
         user = User()
         user.set_unusable_password()  # important
         user = self.__save(user, username, email, first_name, last_name, groups, bio)
+        user.is_active = False
 
-        # TODO: Make an Email Service for sending the emails towards the user
-        transaction.on_commit(lambda: self.__send_registration_email(user))
+        transaction.on_commit(lambda: self.__email_service.send_registration_emai(user))
 
         return user
 
@@ -49,30 +68,11 @@ class UserService:
                last_name: str,
                groups: list[str | Group],
                bio: str|None = None) -> User:
+
         user = self.__save(user, username, email, first_name, last_name, groups, bio)
+
         return user
 
-    def resend_registration_email(self, user: User) -> None:
-        if user.has_usable_password():
-            raise ValueError("User already completed registration.")
-        self.__send_registration_email(user)
-
-    def __send_registration_email(self, user: User) -> None:
-
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        token = default_token_generator.make_token(user)
-        path = reverse("complete_registration", kwargs={"uidb64": uid, "token": token})
-        link = f"{settings.SITE_URL}{path}"
-
-        send_mail(
-            subject="Complete your registration",
-            message=f"Welcome {user.first_name}! Set your password here:\n{link}",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            html_message=render_to_string(
-                "emails/complete_registration.html", {"user": user, "link": link}
-            ),
-        )
 
     def __save(self,
                user: User,
