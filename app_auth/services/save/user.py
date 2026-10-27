@@ -58,10 +58,14 @@ class UserService:
                groups: list[Group],
                bio: str | None = None) -> User:
 
-        user = User.objects.get(email=email)
+        try:
+            user = User.objects.get(email=email)
 
-        if user.has_usable_password():
-            raise ValueError("User already registered.")
+            if user.has_usable_password():
+                raise ValueError("User already registered.")
+
+        except User.DoesNotExist:
+            user = None
 
         if user == None:
             user = User()

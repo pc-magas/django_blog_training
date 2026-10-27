@@ -108,7 +108,6 @@ class AdminUser(CustomAdminFormMixin,admin.ModelAdmin):
             form = UserForm(request.POST)
             if form.is_valid():
                 self.__user_service.create(
-                    username=form.cleaned_data["username"],
                     email=form.cleaned_data["email"],
                     first_name=form.cleaned_data["first_name"],
                     last_name=form.cleaned_data["last_name"],
@@ -140,7 +139,6 @@ class AdminUser(CustomAdminFormMixin,admin.ModelAdmin):
             if form.is_valid():
                 self.__user_service.update(
                     user=obj,
-                    username=form.cleaned_data["username"],
                     email=form.cleaned_data["email"],
                     first_name=form.cleaned_data["first_name"],
                     last_name=form.cleaned_data["last_name"],
