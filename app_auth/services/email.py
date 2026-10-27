@@ -41,7 +41,7 @@ class EmailService:
             message=f"Welcome {user.first_name}! Set your password here:\n{user.email}\n You can login upon your account in:\n{login_url}.",
             recipient_list=[user.email],
             html_message=render_to_string(
-                "emails/welcome_registration.html",
+                "emails/welcome.html",
                 {
                     "user": user,
                     "login_link": login_url ,

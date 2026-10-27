@@ -45,7 +45,7 @@ def complete_registration(request, uidb64, token, user_service: UserService):
 
     return render(
         request,
-        "app_auth/complete_registration.html",
+        "complete_registration.html",
         {
             "form": form,
             "validlink": True,
