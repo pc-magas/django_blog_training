@@ -39,8 +39,6 @@ ADMIN_SITE_TITLE = "Blog Admin Portal"
 INSTALLED_APPS = [
     # Django apps
     'django.contrib.admin',
-    "common",
-    "app_auth",
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -50,6 +48,8 @@ INSTALLED_APPS = [
     "django_injector",
 
     # Apps developed and maintained by us
+    "common",
+    "app_auth",
     "blog",
 ]
 

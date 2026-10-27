@@ -1,6 +1,7 @@
 # app_auth/urls.py
 from django.urls import path, reverse_lazy
 from app_auth import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path(
