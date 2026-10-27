@@ -10,6 +10,7 @@ from app_auth.services.email import EmailService
 
 from injector import inject
 
+
 class UserService:
 
     @inject
@@ -17,7 +18,7 @@ class UserService:
         self.__group_service = group_service
         self.__email_service = email_service
 
-    def get_user_pending_for_registration_complete(self, uidb64:str, token:str)->User:
+    def get_user_pending_for_registration_complete(self, uidb64: str, token: str) -> User:
 
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
@@ -33,9 +34,8 @@ class UserService:
 
         return user
 
-
     @transaction.atomic
-    def complete_registration(self,user:User, token:str, password:str)->None:
+    def complete_registration(self, user: User, token: str, password: str) -> None:
 
         if user.has_usable_password():
             raise ValueError("User already completed registration.")
@@ -50,20 +50,25 @@ class UserService:
 
         transaction.on_commit(lambda: self.__email_service.complete_registration(user))
 
-
     @transaction.atomic
     def create(self,
-               username: str,
                email: str,
                first_name: str,
                last_name: str,
                groups: list[Group],
                bio: str | None = None) -> User:
 
-        user = User()
-        user.set_unusable_password()  # important
-        user = self.__save(user, username, email, first_name, last_name, groups, bio)
+        user = User.objects.get(email=email)
+
+        if user.has_usable_password():
+            raise ValueError("User already registered.")
+
+        if user == None:
+            user = User()
+
         user.is_active = False
+        user.set_unusable_password()  # important
+        user = self.__save(user, email, first_name, last_name, groups, bio)
 
         transaction.on_commit(lambda: self.__email_service.send_registration_email(user))
 
@@ -72,32 +77,28 @@ class UserService:
     @transaction.atomic
     def update(self,
                user: User,
-               username: str,
                email: str,
                first_name: str,
                last_name: str,
                groups: list[str | Group],
-               bio: str|None = None) -> User:
+               bio: str | None = None) -> User:
 
-        user = self.__save(user, username, email, first_name, last_name, groups, bio)
+        user = self.__save(user, email, first_name, last_name, groups, bio)
 
         return user
 
-
     def __save(self,
                user: User,
-               username: str,
                email: str,
                first_name: str,
                last_name: str,
                groups: list[str | Group],
-               bio: str|None = None
+               bio: str | None = None
                ) -> User:
 
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
-        user.username = username
 
         # TODO: XSS SANITIZE
         user.bio = bio
