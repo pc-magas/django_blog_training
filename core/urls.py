@@ -16,13 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from django.conf import settings
+from django.contrib.auth import views as auth_views
 
-admin.site.site_header = "Blog Admin Panel"
-admin.site.index_title = "Manage your blog"
-admin.site.site_title = "Blog Admin Portal"
+admin.site.site_header = getattr(
+    settings, "ADMIN_SITE_HEADER", "Django Administration"
+)
+admin.site.index_title = getattr(
+    settings, "ADMIN_INDEX_TITLE", "Site administration"
+)
+admin.site.site_title = getattr(
+    settings, "ADMIN_SITE_TITLE", "Django site admin"
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("admin/login/", auth_views.LoginView.as_view(template_name="admin/login.html"), name="admin_password_reset"),
     path("", include("app_auth.urls")),
     path("", include("blog.urls")),
 ]

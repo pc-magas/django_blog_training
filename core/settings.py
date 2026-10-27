@@ -30,11 +30,17 @@ ALLOWED_HOSTS = []
 
 SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
 
+ADMIN_SITE_HEADER = "Blog Admin Panel"
+ADMIN_INDEX_TITLE = "Manage your blog"
+ADMIN_SITE_TITLE = "Blog Admin Portal"
+
 # Application definition
 
 INSTALLED_APPS = [
     # Django apps
     'django.contrib.admin',
+    "common",
+    "app_auth",
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,9 +50,7 @@ INSTALLED_APPS = [
     "django_injector",
 
     # Apps developed and maintained by us
-    "common",
     "blog",
-    "app_auth",
 ]
 
 MIDDLEWARE = [
@@ -126,11 +130,8 @@ AUTH_USER_MODEL = "app_auth.User"
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
