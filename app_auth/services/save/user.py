@@ -22,14 +22,17 @@ class UserService:
 
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
+            print(uid)
             user = User.objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError,):
+        except (TypeError, ValueError, OverflowError,User.DoesNotExist):
             return None
 
         if user.has_usable_password():
+            print("User has usable password")
             return None
 
         if default_token_generator.check_token(user, token):
+            print("Invalid token")
             return None
 
         return user
