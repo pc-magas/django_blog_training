@@ -28,11 +28,9 @@ class UserService:
             return None
 
         if user.has_usable_password():
-            print("User has usable password")
             return None
 
         if not default_token_generator.check_token(user, token):
-            print("Invalid token")
             return None
 
         return user
