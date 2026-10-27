@@ -1,24 +1,14 @@
 from app_auth.models import User
 from django.contrib.auth.models import Group
 
-# TODO: Make an Email Service maybe???
-from django.core.mail import send_mail
-
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from django.conf import settings
 from django.db import transaction
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
 
 from app_auth.services.group_service import GroupService
 from app_auth.services.email import EmailService
 
 from injector import inject
-
-
 
 class UserService:
 
@@ -27,16 +17,36 @@ class UserService:
         self.__group_service = group_service
         self.__email_service = email_service
 
+    def get_user_pending_for_registration_complete(self,uidb64:str,token:str)->User:
+
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError,):
+            return None
+
+        if user.has_usable_password():
+            return None
+
+        if default_token_generator.check_token(user, token):
+            return None
+
+        return user
+
+
     @transaction.atomic
-    def complete_registration(self,user:User,password:str)->None:
+    def complete_registration(self,user:User, token:str, password:str)->None:
 
         if user.has_usable_password():
             raise ValueError("User already completed registration.")
 
-        # set password here
+        if password == "":
+            raise ValueError("Password cannot be empty.")
 
-        # Mark user as active
+        user.set_password(password)
         user.is_active = True
+
+        user.save(update_fields=["password", "is_active"])
 
         transaction.on_commit(lambda: self.__email_service.complete_registration(user))
 
