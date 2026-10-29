@@ -92,10 +92,6 @@ class UserService:
 
         return user
 
-    @transaction.atomic
-    def update_password(self,user: User)->None:
-        pass
-
     def __save(self,
                user: User,
                email: str,
