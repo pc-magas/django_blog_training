@@ -9,6 +9,7 @@ from app_auth.services.group_service import GroupService
 from app_auth.services.email import EmailService
 
 from injector import inject
+from common.services.xss_sanitizer import xss_sanitize_html
 
 
 class UserService:
@@ -106,7 +107,7 @@ class UserService:
         user.email = email
 
         # TODO: XSS SANITIZE
-        user.bio = bio
+        user.bio = xss_sanitize_html(bio)
 
         is_superuser = self.__group_service.user_can_be_superuser(groups)
         is_staff = is_superuser

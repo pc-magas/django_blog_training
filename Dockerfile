@@ -59,7 +59,6 @@ FROM common as prod
 
 COPY --from=build --chown=appuser:appuser /app /app
 COPY --from=build --chown=appuser:appuser /static /static
-COPY --from=build --chown=appuser:appuser /app/src/core/settings.py /app/src/core/settings.py
 
 USER appuser
 

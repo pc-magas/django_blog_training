@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from common.services.xss_sanitizer import xss_sanitize_html
+
 import bleach
 
 class Category(models.Model):
@@ -23,20 +25,6 @@ class Article(models.Model):
     def save(self, *args, **kwargs):
 
         # TODO: maybe create a common rules for Field Bleaching
-        self.content = bleach.clean(
-            self.content,
-            tags=[
-                "p", "br", "strong", "em",
-                "ul", "ol", "li",
-                "a", "blockquote",
-            ],
-            attributes={
-                "a": ["href", "title", "target", "rel"],
-            },
-            protocols=["http", "https", "mailto"],
-            strip=True,
-        )
-
-        
+        self.content = xss_sanitize_html(self.content)
 
         super().save(*args, **kwargs)
