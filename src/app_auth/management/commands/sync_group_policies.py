@@ -6,8 +6,16 @@ from django.contrib.auth.models import Group, Permission
 from app_auth.services.policy_service import PolicyService
 from app_auth.utils.permission import permission_codename, permission_description
 
+from injector import inject
+
+
 class Command(BaseCommand):
     help = "Synchronize Django Groups and Permissions from app auth/policy.py files."
+
+    @inject
+    def __init__(self, policy_service: PolicyService, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__policy_service = policy_service
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -19,7 +27,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
 
-        policies = PolicyService.discover_policies()
+        policies = self.__policy_service.discover_policies()
         
         if not policies:
             self.stdout.write(
@@ -30,7 +38,7 @@ class Command(BaseCommand):
         self.stdout.write("Discovered policies:")
         self.__print_policies(policies)
 
-        final_policy = PolicyService.aggregate_policy(policies)
+        final_policy = self.__policy_service.aggregate_policy(policies)
 
         self.stdout.write("\n=================")
 
