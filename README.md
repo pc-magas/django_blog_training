@@ -31,3 +31,27 @@ Tools using for development you can use the `--dev` option for example:
 uv add --dev pytest
 ```
 
+## Development shell
+
+App runs inside a docker container in order to access the shell you need top run:
+
+```shell
+docker compose exec -ti django /bin/bash
+```
+
+## Production rehersal
+
+Upon `docker-compose.testprod.yml` a production-ready image is being built and emulates a production environment.
+In order to test build the image you need to run:
+
+```shell
+docker compose -f ./docker-compose.testprod.yml build django-testprod
+```
+
+Then run:
+
+```shell
+docker compose -f ./docker-compose.testprod.yml up -d
+```
+
+This is used in order to ensure that production image works as supposed to before deployment.
