@@ -33,7 +33,7 @@ services:
     volumes:
       - db_dir:/db_dir
     ports:
-      - "8000:8001"
+      - "8001:8000"
     depends_on:
       - mailer
     networks:

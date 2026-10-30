@@ -1,14 +1,25 @@
-.venv
-__pycache__
-.vscode
-.idea
-docs
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# IDEs
+.vscode/
+.idea/
+
+# Documentation
+docs/
+
+# Git
+.git/
 .gitignore
+
+# Docker
 .dockerignore
-db.sqlite3
 Dockerfile
+
+# Local database
+*.sqlite3
+
+# Dependencies (if generated locally)
 requirements.txt
-.git
-.idea
-.venv
-.vscode
