@@ -10,7 +10,7 @@ RUN useradd --create-home --shell /bin/bash --uid 1000 appuser && \
     mkdir -p /static &&\
     chown -R appuser:appuser /app /db_dir &&\
     chmod 600 /db_dir &&\
-    chmod 644 /static
+    chmod 755 /static
 
 
 FROM common as dev
