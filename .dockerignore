@@ -2,3 +2,13 @@
 __pycache__
 .vscode
 .idea
+docs
+.gitignore
+.dockerignore
+db.sqlite3
+Dockerfile
+requirements.txt
+.git
+.idea
+.venv
+.vscode

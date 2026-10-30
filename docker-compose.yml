@@ -13,6 +13,7 @@ services:
   django:
     build:
       context: .
+      target: dev
     command: uv run --frozen python -m debugpy --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
@@ -24,5 +25,22 @@ services:
     networks:
       - dev
 
+  # A test building and running the final production image.
+  django-testprod:
+    build:
+      context: .
+      target: prod
+    volumes:
+      - db_dir:/db_dir
+    ports:
+      - "8000:8001"
+    depends_on:
+      - mailer
+    networks:
+      - dev
+
 networks:
   dev:
+
+volumes:
+  db_dir:
