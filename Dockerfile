@@ -14,10 +14,7 @@ RUN useradd --create-home --shell /bin/bash --uid 1000 appuser && \
 
 
 FROM common as dev
-
-USER root
-RUN pip install --no-cache-dir uv
-USER appuser
+COPY --from=docker.io/astral/uv:latest /uv /uvx /bin/
 
 
 FROM common as prod
