@@ -7,32 +7,34 @@ ENV DB_HOST=postgresql \
     DB_PORT=5432 \
     DB_NAME=blog \
     DB_USER=blog \
-    DB_PASSWORD=""
+    DB_PASSWORD=""\
+    # We are placing poath here in order to reduce the exported layers
+    PATH="/home/appuser/.local/bin:$PATH"
+    
 
 RUN useradd --create-home --shell /bin/bash --uid 1000 appuser &&\
     mkdir /app &&\
-    mkdir -p /db_dir &&\
     mkdir -p /static &&\
-    chown -R appuser:appuser /app /db_dir /static &&\
-    chmod 666 /db_dir &&\
+    chown -R appuser:appuser /app /static &&\
     chmod 755 /static
 
-VOLUME /db_dir
 VOLUME /static
 
-FROM common as dev
+FROM common as common_dev
 COPY --from=docker.io/astral/uv:latest /uv /uvx /bin/
+
+FROM common_dev as dev
 
 ENV VIRTUAL_ENV=/opt/venv \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
 RUN mkdir -p /opt/venv &&\
-    chown -R appuser:appuser /app /db_dir /opt/venv
+    chown -R appuser:appuser /app /opt/venv
 
 USER appuser
 
-FROM dev as build
+FROM common_dev as build
 
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 

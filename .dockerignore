@@ -27,3 +27,4 @@ requirements.txt
 nginx/*
 docker-compose.testprod.yml
 volumes/*
+.env

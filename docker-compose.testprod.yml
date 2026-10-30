@@ -6,20 +6,42 @@ services:
     ports:
       - 8026:8025
     networks:
-      - dev
+      dev:
+        ipv4_address: ${NGINX_IP}
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     restart: on-failure
 
 
+  postgresql:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: blog
+      POSTGRES_USER: blog
+      POSTGRES_PASSWORD: blog
+    volumes:
+      - ./volumes/pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"   # optional: only needed to connect from the host
+    networks:
+      dev:
+        ipv4_address: ${POSTGRES_IP}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blog -d blog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: on-failure    
+
   # A test building and running the final production image.
   django-testprod:
     build:
       context: .
       target: prod
+    environment:
+      DB_PASSWORD: blog
     volumes:
-      - db_dir:/db_dir
       - static:/static
     expose:
       - "8000"
@@ -42,8 +64,12 @@ services:
     restart: on-failure
 
 volumes:
-  db_dir:
   static:
 
 networks:
   dev:
+    ipam:
+      config:
+        - subnet: ${NET_IP}.0/24
+          gateway: ${NET_IP}.1
+          ip_range: ${NET_IP}.128/25
