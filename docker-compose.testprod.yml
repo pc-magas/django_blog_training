@@ -1,0 +1,49 @@
+name: blog-testprod
+services:
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - 8026:8025
+    networks:
+      - dev
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    restart: on-failure
+
+
+  # A test building and running the final production image.
+  django-testprod:
+    build:
+      context: .
+      target: prod
+    volumes:
+      - db_dir:/db_dir
+      - static:/static
+    expose:
+      - "8000"
+    depends_on:
+      - mailer
+    networks:
+      - dev
+  
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "8001:80"       # same host port you used before
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static:/static:ro
+    depends_on:
+      - django-testprod
+    networks:
+      - dev
+    restart: on-failure
+
+volumes:
+  db_dir:
+  static:
+
+networks:
+  dev:

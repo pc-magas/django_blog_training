@@ -23,3 +23,6 @@ Dockerfile
 
 # Dependencies (if generated locally)
 requirements.txt
+
+nginx/*
+docker-compose.testprod.yml

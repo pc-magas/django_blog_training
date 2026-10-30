@@ -22,8 +22,7 @@ USER appuser
 
 FROM common as prod
 
-COPY --exclude=./static . /app/
-COPY ./static/ /static/*
+COPY . /app/
 
 RUN --mount=from=docker.io/astral/uv:latest,source=/uv,target=/bin/uv \
     --mount=type=cache,target=/root/.cache/uv \
@@ -31,7 +30,9 @@ RUN --mount=from=docker.io/astral/uv:latest,source=/uv,target=/bin/uv \
     pip install --no-cache-dir -r dependencies.txt
 
 # Setting proper DB path
-RUN sed -i 's|^DB_DIR = .*|DB_DIR = Path("/db_dir")|' /app/core/settings.py
+RUN sed -i 's|^DB_DIR = .*|DB_DIR = Path("/db_dir")|' /app/core/settings.py &&\
+    echo 'STATIC_ROOT = Path("/static")' >> /app/core/settings.py &&\
+    python manage.py collectstatic --noinput
 
 VOLUME /static
 VOLUME /db_dir

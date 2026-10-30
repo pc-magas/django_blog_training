@@ -1,3 +1,4 @@
+name: blog-dev
 services:
   mailer:
     image: axllent/mailpit
@@ -25,22 +26,5 @@ services:
     networks:
       - dev
 
-  # A test building and running the final production image.
-  django-testprod:
-    build:
-      context: .
-      target: prod
-    volumes:
-      - db_dir:/db_dir
-    ports:
-      - "8001:8000"
-    depends_on:
-      - mailer
-    networks:
-      - dev
-
 networks:
   dev:
-
-volumes:
-  db_dir:
