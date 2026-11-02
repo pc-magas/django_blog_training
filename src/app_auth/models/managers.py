@@ -25,4 +25,4 @@ class UserManager(BaseUserManager):
         if password==None or password=="":
             return self.__user_service.create_user(email=email,first_name="",last_name="",groups=[ADMIN])
         
-        return self.__user_service.create_usperuser_with_password(email=email,first_name="",last_name="",password=password)
+        return self.__user_service.create_superuser_with_password(email=email,first_name="",last_name="",password=password)

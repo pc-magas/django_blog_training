@@ -11,6 +11,7 @@ from app_auth.auth.groups import ADMIN
 
 from injector import inject
 from common.services.xss_sanitizer import xss_sanitize_html
+from django.contrib.auth import get_user_model
 
 from typing import TYPE_CHECKING
 
@@ -25,6 +26,8 @@ class UserService:
         self.__email_service = email_service
 
     def get_user_pending_for_registration_complete(self, uidb64: str, token: str) -> User:
+        
+        User=get_user_model()
 
         try:
             uid = urlsafe_base64_decode(uidb64).decode()
@@ -65,6 +68,8 @@ class UserService:
                groups: list[Group],
                bio: str | None = None) -> User:
 
+        User = get_user_model()
+
         try:
             user = User.objects.get(email=email)
 
@@ -86,8 +91,10 @@ class UserService:
         return user
 
     @transaction.atomic
-    def create_usperuser_with_password(self, email: str, first_name: str, last_name: str, password: str) -> User:
+    def create_superuser_with_password(self, email: str, first_name: str, last_name: str, password: str) -> User:
         
+        User = get_user_model()
+
         try:
             user = User.objects.get(email=email)
 
@@ -100,15 +107,19 @@ class UserService:
         if user == None:
             user = User()
 
+        user.email = email
         user.first_name = first_name
         user.last_name = last_name
 
         user.set_password(password)
         user.is_staff = True
         user.is_superuser = True
+        user.save()
 
         group_models = self.__group_service.get_groups([ADMIN])
         user.groups.set(group_models)
+
+        return user
 
     @transaction.atomic
     def update(self,
