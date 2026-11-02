@@ -93,6 +93,12 @@ class PolicyService:
 
                 if 'is_superuser' not in group_policy:
                     group_policy['is_superuser'] = False
+                
+                if 'is_staff' not in group_policy:
+                    group_policy['is_staff'] = False or group_policy['is_superuser']
+
+                if 'permissions' not in group_policy:
+                    raise ValueError("A policy should contain permissions")
 
                 existing_policy['permissions'] = [permission_codename(p) for p in existing_policy.get("permissions", ())]
 

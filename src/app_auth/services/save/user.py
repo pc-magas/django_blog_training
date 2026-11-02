@@ -1,4 +1,4 @@
-from app_auth.models import User
+from __future__ import annotations
 from django.contrib.auth.models import Group
 
 from django.db import transaction
@@ -7,10 +7,15 @@ from django.utils.http import urlsafe_base64_decode
 
 from app_auth.services.group_service import GroupService
 from app_auth.services.email import EmailService
+from app_auth.auth.groups import ADMIN
 
 from injector import inject
 from common.services.xss_sanitizer import xss_sanitize_html
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app_auth.models.user import User
 
 class UserService:
 
@@ -75,13 +80,13 @@ class UserService:
         user.is_active = False
         user.set_unusable_password()  # important
         user = self.__save(user, email, first_name, last_name, groups, bio)
-``
+
         transaction.on_commit(lambda: self.__email_service.send_registration_email(user))
 
         return user
 
     @transaction.atomic
-    def create_usperuser_with_password( email: str, first_name: str, last_name: str, password: str) -> User:
+    def create_usperuser_with_password(self, email: str, first_name: str, last_name: str, password: str) -> User:
         
         try:
             user = User.objects.get(email=email)
@@ -102,10 +107,8 @@ class UserService:
         user.is_staff = True
         user.is_superuser = True
 
-        group_models = self.__group_service.get_groups(["ADMIN"])
+        group_models = self.__group_service.get_groups([ADMIN])
         user.groups.set(group_models)
-
-
 
     @transaction.atomic
     def update(self,
