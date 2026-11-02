@@ -1,6 +1,6 @@
 import bleach
 
-def xss_sanitize_html(dirty:str)->str
+def xss_sanitize_html(dirty:str)->str:
     return bleach.clean(
             dirty,
             tags=[
