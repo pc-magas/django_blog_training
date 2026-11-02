@@ -34,6 +34,9 @@ class AdminUser(CustomAdminFormMixin,admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
 
+        if request.user.is_superuser:
+            return True
+
         if obj is not None and obj.pk == request.user.pk:
             # User is editing their own profile
             return True
@@ -47,6 +50,10 @@ class AdminUser(CustomAdminFormMixin,admin.ModelAdmin):
         return self.__group_service.user_can_manage_groups(request.user, set(obj.groups.values_list("name", flat=True)))
 
     def has_delete_permission(self, request, obj=None):
+
+        if request.user.is_superuser:
+            return True
+
         # Don't forget this one: it bypasses your change rules otherwise.
         if obj is not None and obj.pk == request.user.pk:
             return False
