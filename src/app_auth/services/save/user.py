@@ -75,10 +75,37 @@ class UserService:
         user.is_active = False
         user.set_unusable_password()  # important
         user = self.__save(user, email, first_name, last_name, groups, bio)
-
+``
         transaction.on_commit(lambda: self.__email_service.send_registration_email(user))
 
         return user
+
+    @transaction.atomic
+    def create_usperuser_with_password( email: str, first_name: str, last_name: str, password: str) -> User:
+        
+        try:
+            user = User.objects.get(email=email)
+
+            if user.has_usable_password():
+                raise ValueError("User already registered.")
+
+        except User.DoesNotExist:
+            user = None
+
+        if user == None:
+            user = User()
+
+        user.first_name = first_name
+        user.last_name = last_name
+
+        user.set_password(password)
+        user.is_staff = True
+        user.is_superuser = True
+
+        group_models = self.__group_service.get_groups(["ADMIN"])
+        user.groups.set(group_models)
+
+
 
     @transaction.atomic
     def update(self,
@@ -106,7 +133,6 @@ class UserService:
         user.last_name = last_name
         user.email = email
 
-        # TODO: XSS SANITIZE
         user.bio = xss_sanitize_html(bio)
 
         is_superuser = self.__group_service.user_can_be_superuser(groups)
