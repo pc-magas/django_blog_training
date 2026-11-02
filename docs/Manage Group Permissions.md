@@ -56,11 +56,12 @@ POLICY = {
 
 The policy is a dict containing:
 
-* `is_staff`: An indication whether this group can have access on Django Admin
-* `is_admin`: An indication whether this group can have access on Django Admin as admi user
-* `permissions`: a list of permissions a user can have
-* `manage_groups`: a list of allowed users belonging to the groups is allowed. 
-  In order to manage user also should have one of the following permissions:
+* `is_staff`: An indication whether this group can have access on Django Admin. If `is_admin` its value automatically is becomming `True`.
+* `is_admin`: An indication whether this group can have access on Django Admin as admin user.
+* `permissions`: a list of permissions a user can have. If `is_admin` is `True` user has all available permissions.
+* `manage_groups`: a list of allowed users belonging to the groups is allowed.
+  If user upon policy has `is_admin` as `True` it can manage all available user groups.
+  Id order to manage user also should have one of the following permissions:
   * `add_user`
   * `change_user`
   * `delete_user`
